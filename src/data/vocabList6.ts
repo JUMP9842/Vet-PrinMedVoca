@@ -1,0 +1,1085 @@
+import { VocabItem } from '../types';
+
+export const VOCAB_LIST_PART6: VocabItem[] = [
+  // Page 8
+  {
+    id: 'perforating_fracture',
+    word: 'perforating fracture',
+    phoneticTh: 'เพอร์โฟเรทิง แฟรคเจอร์',
+    meaning: 'กระดูกหักทะลุ (ชิ้นกระดูกหรือวัตถุภายนอกทิ่มแทงทะลุเนื้อเยื่อ)',
+    category: 'ระบบกระดูกและข้อ',
+    relatedGroup: 'ประเภทของกระดูกหัก (Types of Fractures)',
+    tags: ['กระดูกหักทะลุ', 'กระดูกทิ่ม'],
+    connectedWordIds: ['open_fracture', 'closed_fracture', 'osteomyelitis']
+  },
+  {
+    id: 'pericardial_disease',
+    word: 'pericardial disease',
+    phoneticTh: 'เพอริคาร์เดียล ดิซีส',
+    meaning: 'โรคของถุงหุ้มหัวใจ (เช่น น้ำคั่งในถุงหุ้มหัวใจ Pericardial Effusion)',
+    category: 'ระบบหัวใจและหลอดเลือด',
+    relatedGroup: 'การอักเสบของหัวใจ (Cardiac Inflammation)',
+    tags: ['ถุงหุ้มหัวใจ', 'น้ำคั่งในถุงหัวใจ'],
+    connectedWordIds: ['carditis', 'endocarditis', 'cardiomegaly', 'ascites']
+  },
+  {
+    id: 'peristalsis',
+    word: 'peristalsis',
+    phoneticTh: 'เพอริสตัลซิส',
+    meaning: 'การบีบรูดเป็นคลื่นของกล้ามเนื้อทางเดินอาหาร',
+    category: 'ระบบทางเดินอาหาร',
+    relatedGroup: 'ความผิดปกติของกระเพาะและลำไส้ (Gastric & Intestinal Pathology)',
+    tags: ['การบีบรูดลำไส้', 'การเคลื่อนไหวทางเดินอาหาร'],
+    connectedWordIds: ['ileus', 'volvulus', 'intestinal_intussusception', 'diarrhea']
+  },
+  {
+    id: 'petechial',
+    word: 'petechial hemorrhage',
+    phoneticTh: 'พีทีเคียล เฮมอร์เรจ',
+    meaning: 'จุดเลือดออกขนาดเล็กเท่าหัวเข็มหมุดใต้ผิวหนังหรือเยื่อเมือก',
+    category: 'ระบบผิวหนังและหลอดเลือด',
+    relatedGroup: 'เลือดออกและจุดจ้ำเลือด (Hemorrhage & Bleeding)',
+    tags: ['จุดเลือดออก', 'เกล็ดเลือดต่ำ'],
+    connectedWordIds: ['ecchymosis', 'hyperemia', 'hematuria']
+  },
+  {
+    id: 'pharyngitis',
+    word: 'pharyngitis',
+    phoneticTh: 'ฟาริงไจติส',
+    meaning: 'คอหอยอักเสบ',
+    category: 'ระบบทางเดินหายใจและช่องปาก',
+    relatedGroup: 'การอักเสบในช่องปาก (Oral Cavity Inflammations)',
+    tags: ['คอหอยอักเสบ', 'เจ็บคอ'],
+    rootMeaning: 'pharyng- (คอหอย) + -itis (อักเสบ)',
+    connectedWordIds: ['pharynx', 'pharyngolaryngitis', 'dysphagia', 'larynx']
+  },
+  {
+    id: 'pharyngolaryngitis',
+    word: 'pharyngolaryngitis',
+    phoneticTh: 'ฟาริงโกแลริงไจติส',
+    meaning: 'คอหอยและกล่องเสียงอักเสบพร้อมกัน',
+    category: 'ระบบทางเดินหายใจและกล่องเสียง',
+    relatedGroup: 'เสียงและกล่องเสียง (Voice & Larynx)',
+    tags: ['คอหอยและกล่องเสียงอักเสบ', 'ไอเสียงก้อง'],
+    connectedWordIds: ['pharyngitis', 'larynx', 'hoarseness', 'cough']
+  },
+  {
+    id: 'pharynx',
+    word: 'pharynx',
+    phoneticTh: 'แฟริงส์',
+    meaning: 'คอหอย (ทางผ่านของอากาศและอาหาร)',
+    category: 'ระบบทางเดินหายใจและทางเดินอาหาร',
+    relatedGroup: 'กายวิภาคทางเดินหายใจและอาหาร (Upper Aerodigestive Anatomy)',
+    tags: ['คอหอย', 'ทางเดินอาหาร'],
+    connectedWordIds: ['larynx', 'pharyngitis', 'dysphagia']
+  },
+  {
+    id: 'phimosis',
+    word: 'phimosis',
+    phoneticTh: 'ไฟโมซิส',
+    meaning: 'หนังหุ้มปลายองคชาตตีบแคบ (ไม่สามารถรูดเปิดหัวองคชาตได้)',
+    category: 'ระบบสืบพันธุ์เพศผู้',
+    relatedGroup: 'โรคระบบสืบพันธุ์เพศผู้ (Male Reproductive Disorders)',
+    tags: ['หนังหุ้มปลายตีบ', 'องคชาตตีบ'],
+    connectedWordIds: ['paraphimosis', 'posthitis', 'penitis']
+  },
+  {
+    id: 'photophobia',
+    word: 'photophobia',
+    phoneticTh: 'โฟโทโฟเบีย',
+    meaning: 'อาการกลัวแสง / ตาไวต่อแสงจนต้องหรี่ตาหลบแสง',
+    category: 'ระบบตาและการมองเห็น',
+    relatedGroup: 'ความผิดปกติของการมองเห็น (Visual Impairments)',
+    tags: ['กลัวแสง', 'หรี่ตา', 'แพ้แสง'],
+    rootMeaning: 'photo- (แสง) + phobia (ความกลัว/ไว)',
+    connectedWordIds: ['blepharospasm', 'uveitis', 'corneal_ulcer', 'keratitis']
+  },
+  {
+    id: 'pinna',
+    word: 'pinna',
+    phoneticTh: 'พินนา',
+    meaning: 'ใบหูภายนอก',
+    category: 'ระบบหูและช่องหู',
+    relatedGroup: 'โครงสร้างหู (Ear Anatomy)',
+    tags: ['ใบหู', 'หู'],
+    connectedWordIds: ['auricle', 'aural_hematoma', 'otitis_externa']
+  },
+  {
+    id: 'pitch',
+    word: 'pitch',
+    phoneticTh: 'พิตช์',
+    meaning: 'ระดับเสียง (ความถี่สูงหรือต่ำของเสียงตรวจร่างกาย)',
+    category: 'การตรวจร่างกายและวินิจฉัย',
+    relatedGroup: 'เสียงตรวจร่างกายและการฟัง (Auscultation & Percussion Sounds)',
+    tags: ['ระดับเสียง', 'ตรวจร่างกาย'],
+    connectedWordIds: ['dull', 'wheeze', 'stridor', 'murmurs']
+  },
+  {
+    id: 'plaques',
+    word: 'plaques',
+    phoneticTh: 'แพลคส์',
+    meaning: 'ปื้นหนายกตัวบนผิวหนัง / แผ่นคราบหนา',
+    category: 'ระบบผิวหนังและขน',
+    relatedGroup: 'รอยโรคปฐมภูมิและทุติยภูมิ (Dermatological Lesions)',
+    tags: ['ปื้นหนา', 'แผ่นคราบ', 'ผิวหนัง'],
+    connectedWordIds: ['papules', 'patches', 'scales', 'crust']
+  },
+  {
+    id: 'pleural_effusion',
+    word: 'pleural effusion',
+    phoneticTh: 'พลูรัล เอฟฟิวชัน',
+    meaning: 'ภาวะน้ำหรือของเหลวคั่งในช่องเยื่อหุ้มปอด',
+    category: 'ระบบทางเดินหายใจ',
+    relatedGroup: 'การสะสมสารน้ำในร่างกาย (Fluid Accumulation & Edema)',
+    tags: ['น้ำในช่องอก', 'น้ำในปอด', 'หายใจไม่ออก'],
+    connectedWordIds: ['pneumothorax', 'dyspnea', 'cyanosis', 'ascites']
+  },
+  {
+    id: 'pneumothorax',
+    word: 'pneumothorax',
+    phoneticTh: 'นิวโมธอแรกซ์',
+    meaning: 'ภาวะมีลมหรืออากาศรั่วสะสมในโพรงเยื่อหุ้มปอด (ปอดแฟบ)',
+    category: 'ระบบทางเดินหายใจ',
+    relatedGroup: 'ภาวะหายใจลำบากและฉุกเฉิน (Dyspnea & Respiratory Distress)',
+    tags: ['ลมในช่องอก', 'ปอดรั่ว', 'ฉุกเฉิน'],
+    rootMeaning: 'pneumo- (อากาศ/ปอด) + thorax (ช่องอก)',
+    connectedWordIds: ['pleural_effusion', 'subcutaneous_emphysema', 'dyspnea']
+  },
+  {
+    id: 'pollakiuria',
+    word: 'pollakiuria',
+    phoneticTh: 'พอลลาคิยูเรีย',
+    meaning: 'อาการปัสสาวะบ่อยกะปริดกะปรอย (แต่ละครั้งออกน้อย)',
+    category: 'ระบบทางเดินปัสสาวะ',
+    relatedGroup: 'ปริมาณและการขับถ่ายปัสสาวะ (Urinary Output Abnormalities)',
+    tags: ['ปัสสาวะบ่อย', 'ฉี่กะปริดกะปรอย'],
+    rootMeaning: 'pollakis (บ่อยครั้ง) + -uria (ปัสสาวะ)',
+    connectedWordIds: ['stranguria', 'dysuria', 'cystitis', 'nocturia']
+  },
+  {
+    id: 'polydipsia',
+    word: 'polydipsia',
+    phoneticTh: 'โพลิดิพเซีย',
+    meaning: 'อาการกระหายน้ำมากผิดปกติ หรือ ดื่มน้ำมาก (PU/PD)',
+    category: 'อาการทั่วไปและต่อมไร้ท่อ',
+    relatedGroup: 'ความผิดปกติของการกินและดื่ม (Feeding & Drinking)',
+    tags: ['กินน้ำมาก', 'กระหายน้ำ', 'เบาหวาน'],
+    rootMeaning: 'poly- (มาก) + dipsa (ความกระหาย)',
+    connectedWordIds: ['polyuria', 'adipsia', 'polyphagia', 'dehydration']
+  },
+  {
+    id: 'polyphagia',
+    word: 'polyphagia',
+    phoneticTh: 'โพลีเฟเจีย',
+    meaning: 'อาการกินจุหรือกินอาหารมากกว่าปกติ',
+    category: 'อาการทั่วไปและต่อมไร้ท่อ',
+    relatedGroup: 'ความผิดปกติของการกินและดื่ม (Feeding & Drinking)',
+    tags: ['กินจุ', 'อยากอาหารมาก', 'หิวบ่อย'],
+    rootMeaning: 'poly- (มาก) + phagia (การกิน)',
+    connectedWordIds: ['anorexia', 'appetite', 'polydipsia', 'coprophagia']
+  },
+  {
+    id: 'polyuria',
+    word: 'polyuria',
+    phoneticTh: 'โพลียูเรีย',
+    meaning: 'ภาวะปัสสาวะปริมาณมากผิดปกติ (PU/PD)',
+    category: 'ระบบทางเดินปัสสาวะและต่อมไร้ท่อ',
+    relatedGroup: 'ปริมาณและการขับถ่ายปัสสาวะ (Urinary Output Abnormalities)',
+    tags: ['ปัสสาวะมาก', 'ฉี่เยอะ'],
+    rootMeaning: 'poly- (มาก) + -uria (ปัสสาวะ)',
+    connectedWordIds: ['polydipsia', 'oliguria', 'anuria', 'pollakiuria']
+  },
+  {
+    id: 'posthitis',
+    word: 'posthitis',
+    phoneticTh: 'โพสไธติส',
+    meaning: 'หนังหุ้มปลายองคชาตอักเสบ',
+    category: 'ระบบสืบพันธุ์เพศผู้',
+    relatedGroup: 'โรคระบบสืบพันธุ์เพศผู้ (Male Reproductive Disorders)',
+    tags: ['หนังหุ้มปลายอักเสบ', 'อวัยวะเพศ'],
+    rootMeaning: 'posthe (หนังหุ้มปลาย) + -itis (อักเสบ)',
+    connectedWordIds: ['penitis', 'phimosis', 'paraphimosis']
+  },
+  {
+    id: 'postpartum_hemorrhage',
+    word: 'postpartum hemorrhage',
+    phoneticTh: 'โพสต์พาร์ทัม เฮมอร์เรจ',
+    meaning: 'การตกเลือดหลังคลอดลูก',
+    category: 'ระบบสืบพันธุ์และสูติศาสตร์',
+    relatedGroup: 'การตั้งครรภ์และการคลอด (Obstetrics & Parturition)',
+    tags: ['ตกเลือดหลังคลอด', 'สูติศาสตร์'],
+    rootMeaning: 'post- (หลัง) + partum (การคลอด) + hemorrhage (ตกเลือด)',
+    connectedWordIds: ['intrapartum_hemorrhage', 'dystocia', 'metritis']
+  },
+  {
+    id: 'pregnancy',
+    word: 'pregnancy',
+    phoneticTh: 'เพร็กแนนซี',
+    meaning: 'การตั้งครรภ์ / ภาวะตั้งท้อง',
+    category: 'ระบบสืบพันธุ์และสูติศาสตร์',
+    relatedGroup: 'การตั้งครรภ์และการคลอด (Obstetrics & Parturition)',
+    tags: ['ตั้งครรภ์', 'ตั้งท้อง'],
+    connectedWordIds: ['pregnant', 'pseudopregnancy', 'dystocia', 'eutocia']
+  },
+  {
+    id: 'pregnant',
+    word: 'pregnant',
+    phoneticTh: 'เพร็กแนนท์',
+    meaning: 'ตั้งครรภ์ / ท้อง',
+    category: 'ระบบสืบพันธุ์และสูติศาสตร์',
+    relatedGroup: 'การตั้งครรภ์และการคลอด (Obstetrics & Parturition)',
+    tags: ['ตั้งท้อง', 'มีลูกในท้อง'],
+    connectedWordIds: ['pregnancy', 'pseudopregnancy']
+  },
+  {
+    id: 'premolar_tooth',
+    word: 'premolar tooth',
+    phoneticTh: 'พรีโมลาร์ ทูธ',
+    meaning: 'ฟันกรามน้อย (ฟันตัดเคี้ยวอยู่หน้าฟันกราม)',
+    category: 'ระบบช่องปากและฟัน',
+    relatedGroup: 'กายวิภาคและโรคฟัน (Dental Anatomy & Disorders)',
+    tags: ['ฟันกรามน้อย', 'ฟัน'],
+    connectedWordIds: ['molar_tooth', 'canine_tooth', 'incisor_tooth']
+  },
+  {
+    id: 'priapism',
+    word: 'priapism',
+    phoneticTh: 'ไพรอะพิซึม',
+    meaning: 'ภาวะองคชาตแข็งค้างต่อเนื่องยาวนานโดยไม่มีการกระตุ้นทางเพศ',
+    category: 'ระบบสืบพันธุ์เพศผู้',
+    relatedGroup: 'โรคระบบสืบพันธุ์เพศผู้ (Male Reproductive Disorders)',
+    tags: ['องคชาตแข็งค้าง', 'ภาวะฉุกเฉิน'],
+    connectedWordIds: ['paraphimosis', 'penitis']
+  },
+  {
+    id: 'proctitis',
+    word: 'proctitis',
+    phoneticTh: 'พร็อคไทติส',
+    meaning: 'ไส้ตรงและทวารหนักอักเสบ',
+    category: 'ระบบทางเดินอาหารและขับถ่าย',
+    relatedGroup: 'ความผิดปกติของทวารหนักและลำไส้ตรง (Anorectal Disorders)',
+    tags: ['ไส้ตรงอักเสบ', 'ทวารหนักอักเสบ'],
+    rootMeaning: 'proct- (ไส้ตรง/ทวาร) + -itis (อักเสบ)',
+    connectedWordIds: ['rectum', 'anal_sacculitis', 'tenesmus', 'dyschezia']
+  },
+  {
+    id: 'productive_cough',
+    word: 'productive cough',
+    phoneticTh: 'โปรดักทีฟ คัฟ',
+    meaning: 'ไอแบบมีเสมหะ / ไอมีของเหลวในทางเดินหายใจ',
+    category: 'ระบบทางเดินหายใจ',
+    relatedGroup: 'อาการไอและเสียงหายใจ (Cough & Respiratory Sounds)',
+    tags: ['ไอมีเสมหะ', 'ไอ'],
+    connectedWordIds: ['dry_cough', 'cough', 'haemoptysis', 'crackles']
+  },
+  {
+    id: 'proptosis',
+    word: 'proptosis',
+    phoneticTh: 'พร็อพโทซิส',
+    meaning: 'ภาวะลูกตาหลุดหรือทะลักออกนอกเบ้าตา (มักเกิดจากอุบัติเหตุ)',
+    category: 'ระบบตาและการมองเห็น',
+    relatedGroup: 'ความผิดปกติทางกายวิภาคของตา (Ocular Structural Anomalies)',
+    tags: ['ตาหลุดจากเบ้า', 'ตาถลน', 'ฉุกเฉิน'],
+    connectedWordIds: ['exophthalmos', 'anophthalmos', 'blindness']
+  },
+  {
+    id: 'prostate_glands',
+    word: 'prostate glands',
+    phoneticTh: 'พรอสเทต แกลนด์ส',
+    meaning: 'ต่อมลูกหมาก',
+    category: 'ระบบสืบพันธุ์เพศผู้',
+    relatedGroup: 'โรคต่อมลูกหมาก (Prostatic Pathology)',
+    tags: ['ต่อมลูกหมาก', 'สืบพันธุ์'],
+    connectedWordIds: ['prostatomegaly', 'cystitis', 'dysuria']
+  },
+  {
+    id: 'prostatomegaly',
+    word: 'prostatomegaly',
+    phoneticTh: 'พรอสทาโทเมกะลี',
+    meaning: 'ภาวะต่อมลูกหมากขยายใหญ่ / ต่อมลูกหมากโต',
+    category: 'ระบบสืบพันธุ์เพศผู้',
+    relatedGroup: 'โรคต่อมลูกหมาก (Prostatic Pathology)',
+    tags: ['ต่อมลูกหมากโต', 'ปัสสาวะขัด'],
+    rootMeaning: 'prostato- (ต่อมลูกหมาก) + -megaly (โตผิดปกติ)',
+    connectedWordIds: ['prostate_glands', 'dysuria', 'tenesmus', 'constipation']
+  },
+  {
+    id: 'pruritus',
+    word: 'pruritus',
+    phoneticTh: 'พรูไรทัส',
+    meaning: 'อาการคันอย่างรุนแรง / ความรู้สึกคัน',
+    category: 'ระบบผิวหนังและขน',
+    relatedGroup: 'โรคผิวหนังอักเสบและภูมิแพ้ (Allergic Dermatitis)',
+    tags: ['อาการคัน', 'เกาตลอด'],
+    connectedWordIds: ['itching', 'atopic', 'excoriation', 'flea_allergy_dermatitis']
+  },
+  {
+    id: 'pseudopregnancy',
+    word: 'pseudopregnancy',
+    phoneticTh: 'ซูโดเพร็กแนนซี',
+    meaning: 'ภาวะท้องเทียม (มีอาการและเต้านมคัดขยายเหมือนท้องจริง)',
+    category: 'ระบบสืบพันธุ์เพศเมีย',
+    relatedGroup: 'การตั้งครรภ์และการคลอด (Obstetrics & Parturition)',
+    tags: ['ท้องเทียม', 'เต้านมคัด'],
+    rootMeaning: 'pseudo- (เทียม/ปลอม) + pregnancy (การตั้งครรภ์)',
+    connectedWordIds: ['pregnancy', 'galactorrhea', 'mamma', 'pyometra']
+  },
+  {
+    id: 'pus',
+    word: 'pus',
+    phoneticTh: 'พัส',
+    meaning: 'หนอง',
+    category: 'การติดเชื้อและของเหลวคัดหลั่ง',
+    relatedGroup: 'การติดเชื้อและโพรงหนอง (Suppuration & Pus)',
+    tags: ['หนอง', 'ติดเชื้อ'],
+    connectedWordIds: ['pustules', 'pyoderma', 'pyuria', 'pyometra', 'abscess']
+  },
+  {
+    id: 'pustules',
+    word: 'pustules',
+    phoneticTh: 'พัสทูลส์',
+    meaning: 'ตุ่มหนองบนผิวหนัง (ตุ่มนูนเล็กที่มีหนองอยู่ภายใน)',
+    category: 'ระบบผิวหนังและขน',
+    relatedGroup: 'รอยโรคปฐมภูมิและทุติยภูมิ (Dermatological Lesions)',
+    tags: ['ตุ่มหนอง', 'สิวหนอง'],
+    connectedWordIds: ['papules', 'vesicles', 'pus', 'pyoderma', 'crust']
+  },
+  {
+    id: 'pyoderma',
+    word: 'pyoderma',
+    phoneticTh: 'ไพโอเดอร์มา',
+    meaning: 'โรคผิวหนังติดเชื้อเป็นหนอง (การติดเชื้อแบคทีเรียที่ผิวหนัง)',
+    category: 'ระบบผิวหนังและขน',
+    relatedGroup: 'การติดเชื้อและโพรงหนอง (Suppuration & Pus)',
+    tags: ['ผิวหนังเป็นหนอง', 'ติดเชื้อผิวหนัง'],
+    rootMeaning: 'pyo- (หนอง) + derma (ผิวหนัง)',
+    connectedWordIds: ['dermatitis', 'pustules', 'crust', 'abscess']
+  },
+  {
+    id: 'pyometra',
+    word: 'pyometra',
+    phoneticTh: 'ไพโอเมทรา',
+    meaning: 'มดลูกอักเสบเป็นหนอง (ภาวะฉุกเฉินในสุนัข/แมวเพศเมีย)',
+    category: 'ระบบสืบพันธุ์เพศเมีย',
+    relatedGroup: 'โรคระบบสืบพันธุ์เพศเมีย (Female Reproductive Disorders)',
+    tags: ['มดลูกอักเสบเป็นหนอง', 'ฉุกเฉิน', 'หนองในมดลูก'],
+    rootMeaning: 'pyo- (หนอง) + metra (มดลูก)',
+    connectedWordIds: ['metritis', 'vaginitis', 'pus', 'fever']
+  },
+  {
+    id: 'pyrexia',
+    word: 'pyrexia',
+    phoneticTh: 'ไพเรกเซีย',
+    meaning: 'ภาวะเป็นไข้ / อุณหภูมิร่างกายสูงขึ้นจากการตอบสนองของระบบภูมิคุ้มกัน',
+    category: 'อาการทั่วไปและสัญญาณชีพ',
+    relatedGroup: 'อุณหภูมิร่างกายและไข้ (Body Temperature & Fever)',
+    tags: ['เป็นไข้', 'ตัวร้อน'],
+    rootMeaning: 'pyretos (ไข้)',
+    connectedWordIds: ['fever', 'febrile', 'afebrile', 'hyperthermia']
+  },
+  {
+    id: 'pyuria',
+    word: 'pyuria',
+    phoneticTh: 'ไพยูเรีย',
+    meaning: 'ปัสสาวะมีหนอง / มีเม็ดเลือดขาวในปัสสาวะปริมาณมาก',
+    category: 'ระบบทางเดินปัสสาวะ',
+    relatedGroup: 'สีและสารปนเปื้อนในปัสสาวะ (Abnormal Urine Contents)',
+    tags: ['ปัสสาวะมีหนอง', 'ติดเชื้อทางเดินปัสสาวะ'],
+    rootMeaning: 'pyo- (หนอง) + -uria (ปัสสาวะ)',
+    connectedWordIds: ['hematuria', 'cystitis', 'nephritis', 'pus']
+  },
+  {
+    id: 'rash',
+    word: 'rash',
+    phoneticTh: 'แรช',
+    meaning: 'เป็นผื่น / ผื่นแดงบนผิวหนัง',
+    category: 'ระบบผิวหนังและขน',
+    relatedGroup: 'รอยโรคปฐมภูมิและทุติยภูมิ (Dermatological Lesions)',
+    tags: ['ผื่น', 'ผื่นแดง'],
+    connectedWordIds: ['erythema', 'papules', 'urticaria', 'dermatitis']
+  },
+  {
+    id: 'rectum',
+    word: 'rectum',
+    phoneticTh: 'เร็กตัม',
+    meaning: 'ไส้ตรง (ส่วนปลายสุดของลำไส้ใหญ่ก่อนเปิดออกสู่ทวารหนัก)',
+    category: 'ระบบทางเดินอาหารและขับถ่าย',
+    relatedGroup: 'ความผิดปกติของทวารหนักและลำไส้ตรง (Anorectal Disorders)',
+    tags: ['ไส้ตรง', 'ลำไส้ตรง'],
+    connectedWordIds: ['proctitis', 'anal_sacculitis', 'tenesmus']
+  },
+  {
+    id: 'reflex',
+    word: 'reflex',
+    phoneticTh: 'รีเฟล็กซ์',
+    meaning: 'รีเฟล็กซ์ หรือ ปฏิกิริยาตอบสนองฉับพลันของระบบประสาทอัตโนมัติ',
+    category: 'ระบบประสาทและการตรวจ',
+    relatedGroup: 'การตรวจพิเศษและวินิจฉัย (Diagnostic Procedures)',
+    tags: ['รีเฟล็กซ์', 'การตอบสนอง'],
+    connectedWordIds: ['nociception', 'paralysis', 'paresis']
+  },
+  {
+    id: 'regurgitation',
+    word: 'regurgitation',
+    phoneticTh: 'รีเกอร์จิเทชัน',
+    meaning: 'การขย้อนอาหารออกมา (อาหารยังไม่ลงกระเพาะ ออกมาโดยไม่เกร็งช่องท้อง)',
+    category: 'ระบบทางเดินอาหาร',
+    relatedGroup: 'อาการอาเจียนและขย้อน (Vomiting & Regurgitation)',
+    tags: ['ขย้อนอาหาร', 'ขย้อน'],
+    connectedWordIds: ['vomiting', 'emesis', 'megaesophagus', 'aortic_regurgitation']
+  },
+  {
+    id: 'respiratory_arrest',
+    word: 'respiratory arrest',
+    phoneticTh: 'เรสไพราทอรี อะเรสต์',
+    meaning: 'ภาวะหยุดหายใจ / การหยุดทำงานของการหายใจอย่างสิ้นเชิง',
+    category: 'ระบบทางเดินหายใจ',
+    relatedGroup: 'ภาวะวิกฤตและฉุกเฉิน (Emergency & Critical States)',
+    tags: ['หยุดหายใจ', 'วิกฤต', 'ช่วยชีวิต'],
+    connectedWordIds: ['cardiac_arrest', 'dyspnea', 'cyanosis', 'moribund']
+  },
+
+  // Page 9 & 10
+  {
+    id: 'scald',
+    word: 'scald',
+    phoneticTh: 'สคอลด์',
+    meaning: 'แผลน้ำร้อนลวก / แผลไหม้จากของเหลวร้อน',
+    category: 'ระบบผิวหนังและบาดแผล',
+    relatedGroup: 'บาดแผลและรอยโรคผิวหนัง (Wounds & Skin Lesions)',
+    tags: ['น้ำร้อนลวก', 'แผลไหม้'],
+    connectedWordIds: ['burn', 'erythema', 'vesicles']
+  },
+  {
+    id: 'scale',
+    word: 'scale',
+    phoneticTh: 'สเกล',
+    meaning: 'ขุยหรือสะเก็ดลอกเป็นเกล็ดบนผิวหนัง (รังแค/ขุยเซลล์ที่ตายแล้ว)',
+    category: 'ระบบผิวหนังและขน',
+    relatedGroup: 'รอยโรคปฐมภูมิและทุติยภูมิ (Dermatological Lesions)',
+    tags: ['สะเก็ดเป็นเกล็ด', 'รังแค', 'ขุยผิวหนัง'],
+    connectedWordIds: ['crust', 'seborrhea', 'hyperkeratosis', 'epidermis']
+  },
+  {
+    id: 'scleritis',
+    word: 'scleritis',
+    phoneticTh: 'สเกลอไรติส',
+    meaning: 'เปลือกลูกตาหรือตาขาวอักเสบ',
+    category: 'ระบบตาและการมองเห็น',
+    relatedGroup: 'การอักเสบในลูกตา (Intraocular Inflammation)',
+    tags: ['ตาขาวอักเสบ', 'เปลือกลูกตา'],
+    rootMeaning: 'scler- (ตาขาว/เปลือกลูกตา) + -itis (อักเสบ)',
+    connectedWordIds: ['uveitis', 'conjunctivitis', 'keratitis']
+  },
+  {
+    id: 'scooting',
+    word: 'scooting',
+    phoneticTh: 'สกูตติ้ง',
+    meaning: 'การไถก้นกับพื้น (พฤติกรรมเมื่อถุงทวารหนักอักเสบหรือคันก้น)',
+    category: 'พฤติกรรมและระบบทางเดินอาหาร',
+    relatedGroup: 'ความผิดปกติของทวารหนักและลำไส้ตรง (Anorectal Disorders)',
+    tags: ['ไถก้น', 'คันก้น', 'ต่อมก้นตัน'],
+    connectedWordIds: ['anal_sacculitis', 'proctitis', 'pruritus']
+  },
+  {
+    id: 'seborrhea',
+    word: 'seborrhea',
+    phoneticTh: 'เซบอร์เรีย',
+    meaning: 'ภาวะผิวหนังสร้างต่อมไขมันมากหรือผลัดเซลล์ผิดปกติ (ผิวหนังมัน/มีรังแคมาก)',
+    category: 'ระบบผิวหนังและขน',
+    relatedGroup: 'ความผิดปกติของต่อมไขมัน (Sebaceous Gland Pathology)',
+    tags: ['ผิวหนังมันเยิ้ม', 'รังแคมาก', 'กลิ่นตัวแรง'],
+    rootMeaning: 'sebum (ไขมัน) + -rrhea (การไหลหลั่ง)',
+    connectedWordIds: ['greasy', 'scale', 'dermatitis', 'alopecia']
+  },
+  {
+    id: 'seizure',
+    word: 'seizure',
+    phoneticTh: 'ซีเชอร์',
+    meaning: 'อาการชัก / การทำงานผิดปกติของกระแสไฟฟ้าในสมองเฉียบพลัน',
+    category: 'ระบบประสาทและความรู้สึก',
+    relatedGroup: 'ภาวะหมดสติและการชัก (Loss of Consciousness & Seizures)',
+    tags: ['ชัก', 'อาการชัก', 'สมอง'],
+    connectedWordIds: ['epilepsy', 'convulsion', 'clonic_spasm', 'syncope']
+  },
+  {
+    id: 'senile_cataract',
+    word: 'senile cataract',
+    phoneticTh: 'ซีไนล์ แคทแทแรกต์',
+    meaning: 'ต้อกระจกในสุนัขหรือสัตว์ชรา',
+    category: 'ระบบตาและการมองเห็น',
+    relatedGroup: 'โรคเลนส์และต้อในตา (Cataracts & Lens Pathology)',
+    tags: ['ต้อกระจกสัตว์แก่', 'ต้อกระจกชรา'],
+    rootMeaning: 'senile (ชรา/แก่) + cataract (ต้อกระจก)',
+    connectedWordIds: ['cataract', 'blindness', 'glaucoma']
+  },
+  {
+    id: 'serofibrinous',
+    word: 'serofibrinous',
+    phoneticTh: 'ซีโรไฟบรินัส',
+    meaning: 'สารคัดหลั่งซีรั่มปนเส้นใยไฟบริน',
+    category: 'สารคัดหลั่งและพยาธิสภาพ',
+    relatedGroup: 'ชนิดของสิ่งคัดหลั่ง (Exudate & Effusion Types)',
+    tags: ['ซีรั่มปนไฟบริน', 'สารน้ำ'],
+    connectedWordIds: ['serofluid', 'seromucoid', 'seropurulent', 'serosanguineous']
+  },
+  {
+    id: 'serofluid',
+    word: 'serofluid',
+    phoneticTh: 'ซีโรฟลูอิด',
+    meaning: 'สารน้ำใส (ของเหลวใสจากเยื่อเมือกหรือหลอดเลือด)',
+    category: 'สารคัดหลั่งและพยาธิสภาพ',
+    relatedGroup: 'ชนิดของสิ่งคัดหลั่ง (Exudate & Effusion Types)',
+    tags: ['สารน้ำใส', 'น้ำใส'],
+    connectedWordIds: ['serofibrinous', 'seromucoid', 'seropurulent', 'serosanguineous']
+  },
+  {
+    id: 'seromucoid',
+    word: 'seromucoid',
+    phoneticTh: 'ซีโรมิวคอยด์',
+    meaning: 'สารน้ำใสปนเมือกเหนียว',
+    category: 'สารคัดหลั่งและพยาธิสภาพ',
+    relatedGroup: 'ชนิดของสิ่งคัดหลั่ง (Exudate & Effusion Types)',
+    tags: ['น้ำใสปนเมือก', 'เมือก'],
+    connectedWordIds: ['serofluid', 'seropurulent', 'serosanguineous']
+  },
+  {
+    id: 'seropurulent',
+    word: 'seropurulent',
+    phoneticTh: 'ซีโรพูรูเลนต์',
+    meaning: 'น้ำเหลืองปนหนอง',
+    category: 'สารคัดหลั่งและพยาธิสภาพ',
+    relatedGroup: 'ชนิดของสิ่งคัดหลั่ง (Exudate & Effusion Types)',
+    tags: ['น้ำเหลืองปนหนอง', 'หนอง'],
+    connectedWordIds: ['pus', 'serosanguineous', 'pyoderma', 'otorrhea']
+  },
+  {
+    id: 'serosanguineous',
+    word: 'serosanguineous',
+    phoneticTh: 'ซีโรแซงกวินัส',
+    meaning: 'น้ำเหลืองปนเลือดสด',
+    category: 'สารคัดหลั่งและพยาธิสภาพ',
+    relatedGroup: 'ชนิดของสิ่งคัดหลั่ง (Exudate & Effusion Types)',
+    tags: ['น้ำเหลืองปนเลือด', 'เลือดปนน้ำเหลือง'],
+    connectedWordIds: ['seropurulent', 'hematuria', 'hyperemia']
+  },
+  {
+    id: 'sialolith',
+    word: 'sialolith',
+    phoneticTh: 'ไซอะโลลิธ',
+    meaning: 'นิ่วน้ำลาย / นิ่วในต่อมหรือท่อน้ำลาย',
+    category: 'ระบบช่องปากและต่อมน้ำลาย',
+    relatedGroup: 'สารคัดหลั่งในช่องปากและต่อมน้ำลาย (Salivary Secretions)',
+    tags: ['นิ่วน้ำลาย', 'ก้อนนิ่ว'],
+    rootMeaning: 'sialo- (น้ำลาย) + lithos (ก้อนหิน/นิ่ว)',
+    connectedWordIds: ['sialocele', 'hypersalivation', 'halitosis']
+  },
+  {
+    id: 'sialocele',
+    word: 'sialosele',
+    phoneticTh: 'ไซอะโลซีล',
+    meaning: 'ถุงน้ำหรือก้อนถุงน้ำลายคั่งในต่อมน้ำลาย (Salivary Mucocele)',
+    category: 'ระบบช่องปากและต่อมน้ำลาย',
+    relatedGroup: 'สารคัดหลั่งในช่องปากและต่อมน้ำลาย (Salivary Secretions)',
+    tags: ['ถุงน้ำลาย', 'ก้อนน้ำลายใต้คาง'],
+    rootMeaning: 'sialo- (น้ำลาย) + -cele (ถุงน้ำ/ก้อนโป่ง)',
+    connectedWordIds: ['sialolith', 'cysts', 'hypersalivation']
+  },
+  {
+    id: 'snaggle_tooth',
+    word: 'snaggle tooth',
+    phoneticTh: 'สแนกเกิล ทูธ',
+    meaning: 'ฟันเก / ฟันที่เรียงผิดตำแหน่งบิดเบี้ยว',
+    category: 'ระบบช่องปากและฟัน',
+    relatedGroup: 'กายวิภาคและโรคฟัน (Dental Anatomy & Disorders)',
+    tags: ['ฟันเก', 'ฟันซ้อนเก'],
+    connectedWordIds: ['maleruption', 'impacted_tooth', 'dental_caries']
+  },
+  {
+    id: 'sneeze',
+    word: 'sneeze',
+    phoneticTh: 'สนีซ',
+    meaning: 'การจาม',
+    category: 'ระบบทางเดินหายใจ',
+    relatedGroup: 'อาการไอและเสียงหายใจ (Cough & Respiratory Sounds)',
+    tags: ['การจาม', 'จาม'],
+    connectedWordIds: ['cough', 'dyspnea', 'epistaxis']
+  },
+  {
+    id: 'spasm',
+    word: 'spasm',
+    phoneticTh: 'สปาสซึม',
+    meaning: 'การชักกระตุก หรือ การบีบเกร็งของกล้ามเนื้ออย่างเฉียบพลัน',
+    category: 'ระบบประสาทและกล้ามเนื้อ',
+    relatedGroup: 'ความตึงตัวของกล้ามเนื้อ (Muscle Tone Abnormalities)',
+    tags: ['กล้ามเนื้อกระตุกเกร็ง', 'การเกร็ง'],
+    connectedWordIds: ['myospasm', 'clonic_spasm', 'tetany', 'opisthotonus']
+  },
+  {
+    id: 'spiral_fracture',
+    word: 'spiral fracture',
+    phoneticTh: 'สไปรัล แฟรคเจอร์',
+    meaning: 'กระดูกหักบิด / รอยหักเป็นเกลียวจากการถูกบิดกระชาก',
+    category: 'ระบบกระดูกและข้อ',
+    relatedGroup: 'ประเภทของกระดูกหัก (Types of Fractures)',
+    tags: ['กระดูกหักบิดเกลียว', 'กระดูกหัก'],
+    connectedWordIds: ['transverse_fracture', 'oblique_fracture', 'closed_fracture']
+  },
+  {
+    id: 'splenomegaly',
+    word: 'splenomegaly',
+    phoneticTh: 'สพลีโนเมกะลี',
+    meaning: 'ม้ามโตผิดปกติ',
+    category: 'ระบบภูมิคุ้มกันและช่องท้อง',
+    relatedGroup: 'อวัยวะโตผิดปกติ (-megaly)',
+    tags: ['ม้ามโต', 'ม้าม'],
+    rootMeaning: 'spleno- (ม้าม) + -megaly (โตผิดปกติ)',
+    connectedWordIds: ['hepatomegaly', 'cardiomegaly', 'nephromegaly', 'lymphadenitis']
+  },
+  {
+    id: 'stapes',
+    word: 'stapes',
+    phoneticTh: 'สเตปีส',
+    meaning: 'กระดูกหูรูปโกรน (กระดูกหูชั้นกลางชิ้นที่สามส่งต่อเสียงสู่หูชั้นใน)',
+    category: 'ระบบหูและช่องหู',
+    relatedGroup: 'โครงสร้างหู (Ear Anatomy)',
+    tags: ['กระดูกหูรูปโกรน', 'หูชั้นกลาง'],
+    connectedWordIds: ['incus', 'malleus', 'cochlea', 'tympanic_membrane']
+  },
+  {
+    id: 'steatorrhea',
+    word: 'steatorrhea',
+    phoneticTh: 'สเตียทอร์เรีย',
+    meaning: 'ภาวะอุจจาระมีไขมันปนมาก (อุจจาระมัน ลอยน้ำ กลิ่นเหม็นหืน)',
+    category: 'ระบบทางเดินอาหารและตับอ่อน',
+    relatedGroup: 'ลักษณะอุจจาระผิดปกติ (Abnormal Stool Characteristics)',
+    tags: ['อุจจาระมัน', 'ไขมันในอุจจาระ', 'ตับอ่อน'],
+    rootMeaning: 'steato- (ไขมัน) + -rrhea (การไหล)',
+    connectedWordIds: ['bilious_stool', 'melena', 'diarrhea']
+  },
+  {
+    id: 'stertor',
+    word: 'stertor',
+    phoneticTh: 'สเตอร์ตอร์',
+    meaning: 'เสียงกรน / เสียงหายใจดังครืดคราดจากทางเดินหายใจส่วนบนอุดกั้น',
+    category: 'ระบบทางเดินหายใจ',
+    relatedGroup: 'อาการไอและเสียงหายใจ (Cough & Respiratory Sounds)',
+    tags: ['เสียงกรน', 'หายใจเสียงดัง'],
+    connectedWordIds: ['stridor', 'wheeze', 'dyspnea', 'tracheal_collapse']
+  },
+  {
+    id: 'stomatitis',
+    word: 'stomatitis',
+    phoneticTh: 'สโตมาไททิส',
+    meaning: 'ปากเปื่อย / เยื่อบุช่องปากอักเสบ',
+    category: 'ระบบช่องปากและฟัน',
+    relatedGroup: 'การอักเสบในช่องปาก (Oral Cavity Inflammations)',
+    tags: ['ปากเปื่อย', 'แผลในปาก', 'ช่องปากอักเสบ'],
+    rootMeaning: 'stomat- (ช่องปาก) + -itis (อักเสบ)',
+    connectedWordIds: ['stomatoglossitis', 'gingivitis', 'uloglossitis', 'cheilitis']
+  },
+  {
+    id: 'stomatoglossitis',
+    word: 'stomatoglossitis',
+    phoneticTh: 'สโตมาโทกลอสไซติส',
+    meaning: 'ช่องปากและลิ้นอักเสบพร้อมกัน',
+    category: 'ระบบช่องปากและฟัน',
+    relatedGroup: 'การอักเสบในช่องปาก (Oral Cavity Inflammations)',
+    tags: ['ปากและลิ้นอักเสบ', 'ลิ้นอักเสบ'],
+    rootMeaning: 'stomat- (ปาก) + gloss- (ลิ้น) + -itis (อักเสบ)',
+    connectedWordIds: ['stomatitis', 'uloglossitis', 'gingivitis']
+  },
+  {
+    id: 'stranguria',
+    word: 'stranguria',
+    phoneticTh: 'สแตรงกูเรีย',
+    meaning: 'อาการปวดเบ่งปัสสาวะกะปริดกะปรอย / ปวดขัดเบา',
+    category: 'ระบบทางเดินปัสสาวะ',
+    relatedGroup: 'ปริมาณและการขับถ่ายปัสสาวะ (Urinary Output Abnormalities)',
+    tags: ['ปวดขัดเบา', 'ปวดเบ่งฉี่', 'ฉี่ไม่ออก'],
+    rootMeaning: 'stranx (หยด) + -uria (ปัสสาวะ)',
+    connectedWordIds: ['dysuria', 'pollakiuria', 'tenesmus', 'cystalgia']
+  },
+  {
+    id: 'stridor',
+    word: 'stridor',
+    phoneticTh: 'สไตรดอร์',
+    meaning: 'เสียงหายใจฮืดแหลมสูง (เกิดจากกล่องเสียงหรือหลอดลมส่วนบนตีบแคบ)',
+    category: 'ระบบทางเดินหายใจ',
+    relatedGroup: 'อาการไอและเสียงหายใจ (Cough & Respiratory Sounds)',
+    tags: ['เสียงหายใจฮืด', 'หลอดลมตีบ'],
+    connectedWordIds: ['stertor', 'wheeze', 'tracheal_collapse', 'larynx']
+  },
+  {
+    id: 'subcutaneous_emphysema',
+    word: 'subcutaneous emphysema',
+    phoneticTh: 'ซับคิวเทเนียส เอมฟีซีมา',
+    meaning: 'ภาวะมีฟองอากาศคั่งสะสมในชั้นใต้ผิวหนัง (คลำได้ยินเสียงกรอบแกรบ)',
+    category: 'ระบบผิวหนังและทางเดินหายใจ',
+    relatedGroup: 'ภาวะหายใจลำบากและฉุกเฉิน (Dyspnea & Respiratory Distress)',
+    tags: ['ลมใต้ผิวหนัง', 'อากาศใต้ผิว'],
+    connectedWordIds: ['pneumothorax', 'emphysema', 'dermis']
+  },
+  {
+    id: 'sunken_eye',
+    word: 'sunken eye',
+    phoneticTh: 'ซังเคน อาย',
+    meaning: 'ตาจมลึกเข้าไปในเบ้าตา (สัญญาณสำคัญของภาวะขาดน้ำรุนแรง)',
+    category: 'ระบบตาและสารน้ำ',
+    relatedGroup: 'ความผิดปกติทางกายวิภาคของตา (Ocular Structural Anomalies)',
+    tags: ['ตาจมลึก', 'ขาดน้ำ', 'ช็อก'],
+    connectedWordIds: ['dehydration', 'exophthalmos', 'microphthalmos']
+  },
+  {
+    id: 'syncope',
+    word: 'syncope',
+    phoneticTh: 'ซินโคปี',
+    meaning: 'ภาวะหมดสติชั่วคราว / เป็นลมวูบ',
+    category: 'ระบบหัวใจและประสาท',
+    relatedGroup: 'ภาวะหมดสติและการชัก (Loss of Consciousness & Seizures)',
+    tags: ['เป็นลม', 'วูบ', 'หมดสติชั่วคราว'],
+    connectedWordIds: ['absence', 'unconscious', 'cardiac_arrest', 'arrhythmia']
+  },
+  {
+    id: 'systole',
+    word: 'systole',
+    phoneticTh: 'ซิสโทลี',
+    meaning: 'เสียงหรือช่วงระยะของการบีบตัวของหัวใจ',
+    category: 'ระบบหัวใจและหลอดเลือด',
+    relatedGroup: 'เสียงและกลไกการบีบคลายตัวของหัวใจ (Cardiac Cycle)',
+    tags: ['หัวใจบีบตัว', 'ช่วงบีบตัว'],
+    connectedWordIds: ['disystole', 'murmurs', 'tachycardia']
+  },
+  {
+    id: 'tachycardia',
+    word: 'tachycardia',
+    phoneticTh: 'แทคคิคาร์เดีย',
+    meaning: 'ภาวะหัวใจเต้นเร็วกว่าปกติ',
+    category: 'ระบบหัวใจและหลอดเลือด',
+    relatedGroup: 'จังหวะและการเต้นของหัวใจ (Cardiac Rhythms & Rates)',
+    tags: ['หัวใจเต้นเร็ว', 'ชีพจรเร็ว'],
+    rootMeaning: 'tachy- (เร็ว) + cardia (หัวใจ)',
+    connectedWordIds: ['bradycardia', 'arrhythmia', 'fibrillation', 'fever']
+  },
+  {
+    id: 'tendonitis',
+    word: 'tendonitis',
+    phoneticTh: 'เทนโดไนติส',
+    meaning: 'เอ็นกล้ามเนื้ออักเสบ',
+    category: 'ระบบประสาทและกล้ามเนื้อ',
+    relatedGroup: 'การบาดเจ็บของกล้ามเนื้อและกระดูก (Musculoskeletal Trauma)',
+    tags: ['เอ็นอักเสบ', 'เจ็บเอ็น'],
+    rootMeaning: 'tendon (เอ็น) + -itis (อักเสบ)',
+    connectedWordIds: ['myositis', 'myorrhexis', 'arthritis', 'lameness']
+  },
+  {
+    id: 'tenesmus',
+    word: 'tenesmus',
+    phoneticTh: 'เทเนสมัส',
+    meaning: 'อาการปวดเบ่งอุจจาระหรือปัสสาวะอย่างทรมาน (เบ่งตลอดเวลาแต่ออกน้อย)',
+    category: 'ระบบทางเดินอาหารและปัสสาวะ',
+    relatedGroup: 'ความผิดปกติของการขับถ่ายอุจจาระ (Bowel Movement Disorders)',
+    tags: ['ปวดเบ่ง', 'เบ่งตลอดเวลา'],
+    connectedWordIds: ['stranguria', 'dyschezia', 'proctitis', 'cystitis']
+  },
+  {
+    id: 'tetany',
+    word: 'tetany',
+    phoneticTh: 'เททานี',
+    meaning: 'อาการชักเกร็งกล้ามเนื้อแข็งค้าง (มักเกิดจากแคลเซียมในเลือดต่ำ)',
+    category: 'ระบบประสาทและกล้ามเนื้อ',
+    relatedGroup: 'ความตึงตัวของกล้ามเนื้อ (Muscle Tone Abnormalities)',
+    tags: ['ชักเกร็ง', 'เกร็งค้าง', 'แคลเซียมต่ำ'],
+    connectedWordIds: ['opisthotonus', 'spasm', 'myospasm', 'convulsion']
+  },
+  {
+    id: 'tracheobronchitis',
+    word: 'thacheobronchitis',
+    phoneticTh: 'เทรคีโอโบรนไคติส',
+    meaning: 'ท่อลมและหลอดลมอักเสบ (เช่น โรคหวัดคอกสุนัข Kennel Cough)',
+    category: 'ระบบทางเดินหายใจ',
+    relatedGroup: 'การอักเสบของทางเดินหายใจ (Respiratory Inflammations)',
+    tags: ['หลอดลมอักเสบ', 'หวัดคอก', 'ไอเสียงก้อง'],
+    rootMeaning: 'tracheo- (ท่อลม) + bronch- (หลอดลม) + -itis (อักเสบ)',
+    connectedWordIds: ['tracheitis', 'dry_cough', 'cough', 'dyspnea']
+  },
+  {
+    id: 'thelitis',
+    word: 'thelitis',
+    phoneticTh: 'ธีไลติส',
+    meaning: 'หัวนมอักเสบ',
+    category: 'ระบบสืบพันธุ์และต่อมน้ำนม',
+    relatedGroup: 'ความผิดปกติของเต้านม (Mammary Disorders)',
+    tags: ['หัวนมอักเสบ', 'เต้านม'],
+    rootMeaning: 'thele (หัวนม) + -itis (อักเสบ)',
+    connectedWordIds: ['nipple', 'mastitis', 'mamma']
+  },
+  {
+    id: 'third_eyelid_prolapse',
+    word: 'third eyelid prolapse',
+    phoneticTh: 'เธิร์ด อายลิด โพรแลปส์',
+    meaning: 'ต่อมหนังตาที่สามยื่นปลิ้นออกมา (โรคเชอร์รี่อาย Cherry Eye)',
+    category: 'ระบบตาและการมองเห็น',
+    relatedGroup: 'ความผิดปกติของเปลือกตา (Eyelid Disorders)',
+    tags: ['เชอร์รี่อาย', 'หนังตาที่สามปลิ้น', 'Cherry Eye'],
+    connectedWordIds: ['conjunctivitis', 'blepharitis', 'epiphora']
+  },
+  {
+    id: 'thrill',
+    word: 'thrill',
+    phoneticTh: 'ธริลล์',
+    meaning: 'การสั่นสะเทือนระรัวของหัวใจที่สามารถรู้สึกได้ด้วยการวางมือคลำ',
+    category: 'ระบบหัวใจและหลอดเลือด',
+    relatedGroup: 'โรคลิ้นหัวใจและหลอดเลือด (Valvular & Vascular Diseases)',
+    tags: ['คลำพบเสียงฟู่', 'หัวใจสั่นระรัว'],
+    connectedWordIds: ['murmurs', 'arrhythmia', 'fibrillation']
+  },
+  {
+    id: 'tracheal_collapse',
+    word: 'tracheal collapse',
+    phoneticTh: 'เทรเคียล คอลแลปส์',
+    meaning: 'หลอดลมแฟบ (กระดูกอ่อนหลอดลมอ่อนยวบ หายใจเสียงคล้ายห่านร้อง)',
+    category: 'ระบบทางเดินหายใจ',
+    relatedGroup: 'ภาวะหายใจลำบากและฉุกเฉิน (Dyspnea & Respiratory Distress)',
+    tags: ['หลอดลมแฟบ', 'หายใจติดขัด', 'ไอเสียงห่านร้อง'],
+    connectedWordIds: ['tracheitis', 'stridor', 'cough', 'cyanosis']
+  },
+  {
+    id: 'tracheitis',
+    word: 'tracheitis',
+    phoneticTh: 'เทรคิไอทิส',
+    meaning: 'ท่อลมอักเสบ',
+    category: 'ระบบทางเดินหายใจ',
+    relatedGroup: 'การอักเสบของทางเดินหายใจ (Respiratory Inflammations)',
+    tags: ['ท่อลมอักเสบ', 'ไอ'],
+    rootMeaning: 'trache- (ท่อลม) + -itis (อักเสบ)',
+    connectedWordIds: ['tracheobronchitis', 'tracheal_collapse', 'cough']
+  },
+  {
+    id: 'transverse_fracture',
+    word: 'transverse fracture',
+    phoneticTh: 'ทรานส์เวิร์ส แฟรคเจอร์',
+    meaning: 'กระดูกหักตามแนวขวาง (รอยหักตั้งฉากกับแนวยาวของกระดูก)',
+    category: 'ระบบกระดูกและข้อ',
+    relatedGroup: 'ประเภทของกระดูกหัก (Types of Fractures)',
+    tags: ['กระดูกหักตามขวาง', 'กระดูกหัก'],
+    connectedWordIds: ['oblique_fracture', 'spiral_fracture', 'closed_fracture']
+  },
+  {
+    id: 'trichiasis',
+    word: 'trichiasis',
+    phoneticTh: 'ไตรคิเอซิส',
+    meaning: 'ขนตาแยงเข้าทิ่มกระจกตา (แนวขนตางอพับเข้าด้านใน)',
+    category: 'ระบบตาและการมองเห็น',
+    relatedGroup: 'ความผิดปกติของขนตาและเปลือกตา (Eyelashes Pathology)',
+    tags: ['ขนตาทิ่มตา', 'ขนตาแยงตา'],
+    rootMeaning: 'trich- (ขน) + -iasis (ภาวะผิดปกติ)',
+    connectedWordIds: ['distichiasis', 'entropion', 'corneal_ulcer', 'eyelashes']
+  },
+  {
+    id: 'tumors',
+    word: 'tumors',
+    phoneticTh: 'ทูเมอร์ส',
+    meaning: 'เนื้องอก / ก้อนเนื้อเจริญผิดปกติ',
+    category: 'เนื้องอกและรอยโรคเนื้อเยื่อ',
+    relatedGroup: 'ก้อนเนื้อและถุงน้ำ (Cysts & Tumors)',
+    tags: ['เนื้องอก', 'ก้อนเนื้อ'],
+    connectedWordIds: ['mammary_gland_tumor', 'osteosarcoma', 'osteoma', 'cysts', 'nodules']
+  },
+  {
+    id: 'tympanic_membrane',
+    word: 'tympanic membrane',
+    phoneticTh: 'ทิมแพนิก เมมเบรน',
+    meaning: 'เยื่อแก้วหู (แผ่นกั้นระหว่างหูชั้นนอกและหูชั้นกลาง)',
+    category: 'ระบบหูและช่องหู',
+    relatedGroup: 'โครงสร้างหู (Ear Anatomy)',
+    tags: ['เยื่อแก้วหู', 'แก้วหู'],
+    connectedWordIds: ['eardrum', 'myringitis', 'otitis_media', 'malleus']
+  },
+  {
+    id: 'ulceration',
+    word: 'ulceration',
+    phoneticTh: 'อัลเซอเรชัน',
+    meaning: 'แผลเปื่อย / แผลหลุมลึกที่มีการสูญเสียชั้นผิวหนังหรือเยื่อบุ',
+    category: 'ระบบผิวหนังและทางเดินอาหาร',
+    relatedGroup: 'บาดแผลและรอยโรคผิวหนัง (Wounds & Skin Lesions)',
+    tags: ['แผลเปื่อย', 'แผลหลุม'],
+    connectedWordIds: ['corneal_ulcer', 'decubitus', 'necrosis', 'abrasion']
+  },
+  {
+    id: 'uloglossitis',
+    word: 'uloglossitis',
+    phoneticTh: 'ยูโลกลอสไซติส',
+    meaning: 'เหงือกและลิ้นอักเสบ',
+    category: 'ระบบช่องปากและฟัน',
+    relatedGroup: 'การอักเสบในช่องปาก (Oral Cavity Inflammations)',
+    tags: ['เหงือกและลิ้นอักเสบ', 'ช่องปาก'],
+    rootMeaning: 'ulo- (เหงือก) + gloss- (ลิ้น) + -itis (อักเสบ)',
+    connectedWordIds: ['uloncus', 'stomatitis', 'gingivitis', 'stomatoglossitis']
+  },
+  {
+    id: 'uloncus',
+    word: 'uloncus',
+    phoneticTh: 'ยูลองคัส',
+    meaning: 'เหงือกบวมเป่ง / ก้อนบวมที่เหงือก',
+    category: 'ระบบช่องปากและฟัน',
+    relatedGroup: 'การอักเสบในช่องปาก (Oral Cavity Inflammations)',
+    tags: ['เหงือกบวม', 'ก้อนที่เหงือก'],
+    rootMeaning: 'ulo- (เหงือก) + onkos (ก้อนบวม)',
+    connectedWordIds: ['gingival', 'gingivitis', 'uloglossitis']
+  },
+  {
+    id: 'umbilical_hernia',
+    word: 'umbilical hernia',
+    phoneticTh: 'อัมบิลิคอล เฮอร์เนีย',
+    meaning: 'ไส้เลื่อนสะดือ (อวัยวะภายในดันผ่านรอยแยกสะดือ)',
+    category: 'ระบบทางเดินอาหารและช่องท้อง',
+    relatedGroup: 'ไส้เลื่อนและความผิดปกติของผนังช่องท้อง (Hernias)',
+    tags: ['ไส้เลื่อนสะดือ', 'สะดือจุ่น'],
+    connectedWordIds: ['diaphragmatic_hernia', 'pendulous_abdomen']
+  },
+  {
+    id: 'unconscious',
+    word: 'unconscious',
+    phoneticTh: 'อันคอนเชียส',
+    meaning: 'ไม่รู้สึกตัว / หมดสติ',
+    category: 'ระบบประสาทและความรู้สึก',
+    relatedGroup: 'ระดับความรู้สึกตัว (Levels of Consciousness)',
+    tags: ['ไม่รู้สึกตัว', 'หมดสติ'],
+    connectedWordIds: ['conscious', 'syncope', 'absence', 'moribund']
+  },
+  {
+    id: 'urination',
+    word: 'urination',
+    phoneticTh: 'ยูริเนชัน',
+    meaning: 'การถ่ายปัสสาวะ / การขับปัสสาวะ',
+    category: 'ระบบทางเดินปัสสาวะ',
+    relatedGroup: 'ปริมาณและการขับถ่ายปัสสาวะ (Urinary Output Abnormalities)',
+    tags: ['การขับปัสสาวะ', 'ฉี่'],
+    connectedWordIds: ['inappropriate_urination', 'dysuria', 'polyuria', 'anuria']
+  },
+  {
+    id: 'urticaria',
+    word: 'urticarial',
+    phoneticTh: 'เออติคาเรีย',
+    meaning: 'ลมพิษ (ผื่นบวมนูนคันเฉียบพลันจากปฏิกิริยาภูมิแพ้)',
+    category: 'ระบบผิวหนังและภูมิแพ้',
+    relatedGroup: 'โรคผิวหนังอักเสบและภูมิแพ้ (Allergic Dermatitis)',
+    tags: ['ลมพิษ', 'ผื่นลมพิษ', 'แพ้'],
+    connectedWordIds: ['wheals', 'rash', 'pruritus', 'atopic']
+  },
+  {
+    id: 'uveitis',
+    word: 'uveitis',
+    phoneticTh: 'ยูวีไอทิส',
+    meaning: 'ผนังลูกตาชั้นกลางอักเสบ หรือ โรคม่านตาอักเสบ (Uvea อักเสบ)',
+    category: 'ระบบตาและการมองเห็น',
+    relatedGroup: 'การอักเสบในลูกตา (Intraocular Inflammation)',
+    tags: ['ม่านตาอักเสบ', 'ลูกตาชั้นกลางอักเสบ', 'ตาแดงใน'],
+    rootMeaning: 'uvea + -itis (อักเสบ)',
+    connectedWordIds: ['iritis', 'scleritis', 'hypopyon', 'hyphaema', 'photophobia']
+  },
+  {
+    id: 'vaginal_hyperplasia',
+    word: 'vaginal hyperplasia',
+    phoneticTh: 'แวจินอล ไฮเปอร์เพลเซีย',
+    meaning: 'การเจริญเกินของเยื่อบุผนังช่องคลอด (มักเกิดช่วงเป็นสัด)',
+    category: 'ระบบสืบพันธุ์เพศเมีย',
+    relatedGroup: 'โรคระบบสืบพันธุ์เพศเมีย (Female Reproductive Disorders)',
+    tags: ['ช่องคลอดเจริญเกิน', 'ช่องคลอดบวม'],
+    connectedWordIds: ['vaginal_prolapse', 'vaginitis', 'vaginocele']
+  },
+  {
+    id: 'vaginal_prolapse',
+    word: 'vaginal prolapse',
+    phoneticTh: 'แวจินอล โพรแลปส์',
+    meaning: 'ช่องคลอดโผล่ยื่นย้อยออกมาภายนอก',
+    category: 'ระบบสืบพันธุ์เพศเมีย',
+    relatedGroup: 'โรคระบบสืบพันธุ์เพศเมีย (Female Reproductive Disorders)',
+    tags: ['ช่องคลอดโผล่', 'ช่องคลอดย้อย'],
+    connectedWordIds: ['vaginal_hyperplasia', 'vaginocele', 'dystocia']
+  },
+  {
+    id: 'vaginitis',
+    word: 'vaginitis',
+    phoneticTh: 'แวจิไนติส',
+    meaning: 'ช่องคลอดอักเสบ',
+    category: 'ระบบสืบพันธุ์เพศเมีย',
+    relatedGroup: 'โรคระบบสืบพันธุ์เพศเมีย (Female Reproductive Disorders)',
+    tags: ['ช่องคลอดอักเสบ', 'ตกขาว'],
+    rootMeaning: 'vagin- (ช่องคลอด) + -itis (อักเสบ)',
+    connectedWordIds: ['pachyvaginitis', 'metritis', 'pyometra']
+  },
+  {
+    id: 'vaginocele',
+    word: 'vaginocele',
+    phoneticTh: 'แวจิโนซีล',
+    meaning: 'ช่องคลอดปลิ้น / ภาวะไส้เลื่อนยื่นดันเข้ามาในช่องคลอด',
+    category: 'ระบบสืบพันธุ์เพศเมีย',
+    relatedGroup: 'โรคระบบสืบพันธุ์เพศเมีย (Female Reproductive Disorders)',
+    tags: ['ช่องคลอดปลิ้น', 'ก้อนในช่องคลอด'],
+    rootMeaning: 'vagino- (ช่องคลอด) + -cele (การโป่ง/ไส้เลื่อน)',
+    connectedWordIds: ['vaginal_prolapse', 'vaginal_hyperplasia']
+  },
+  {
+    id: 'vesicles',
+    word: 'vesicles',
+    phoneticTh: 'เวสิเคิลส์',
+    meaning: 'ตุ่มพอง / ตุ่มน้ำใสขนาดเล็กบนผิวหนังหรือเยื่อบุ',
+    category: 'ระบบผิวหนังและบาดแผล',
+    relatedGroup: 'รอยโรคปฐมภูมิและทุติยภูมิ (Dermatological Lesions)',
+    tags: ['ตุ่มพอง', 'ตุ่มน้ำใส'],
+    connectedWordIds: ['pustules', 'burn', 'scald', 'papules']
+  },
+  {
+    id: 'volvulus',
+    word: 'volvulus',
+    phoneticTh: 'วอลวูลัส',
+    meaning: 'ไส้บิดเกลียว / ลำไส้หรือกระเพาะบิดหมุนรอบแกนตัวเอง',
+    category: 'ระบบทางเดินอาหารและช่องท้อง',
+    relatedGroup: 'ความผิดปกติของกระเพาะและลำไส้ (Gastric & Intestinal Pathology)',
+    tags: ['ไส้บิดเกลียว', 'กระเพาะบิด', 'GDV', 'ฉุกเฉิน'],
+    rootMeaning: 'volvere (การหมุน/ม้วน)',
+    connectedWordIds: ['gastric_dilation', 'intestinal_intussusception', 'ileus']
+  },
+  {
+    id: 'vomiting',
+    word: 'vomiting',
+    phoneticTh: 'วอมิททิ่ง',
+    meaning: 'การอาเจียน (มีแรงบีบเกร็งจากกระเพาะและกล้ามเนื้อหน้าท้อง)',
+    category: 'ระบบทางเดินอาหาร',
+    relatedGroup: 'อาการอาเจียนและขย้อน (Vomiting & Regurgitation)',
+    tags: ['การอาเจียน', 'อ้วก'],
+    connectedWordIds: ['emesis', 'regurgitation', 'nausea', 'hematemesis']
+  },
+  {
+    id: 'weight_loss',
+    word: 'weight loss',
+    phoneticTh: 'เวท ลอส',
+    meaning: 'น้ำหนักตัวลดลงผิดปกติ',
+    category: 'อาการทั่วไปและเมตาบอลิซึม',
+    relatedGroup: 'ภาวะโภชนาการและน้ำหนักตัว (Body Weight & Nutrition)',
+    tags: ['น้ำหนักลด', 'ผอมลง'],
+    connectedWordIds: ['cachectic', 'emaciated', 'anorexia', 'obese']
+  },
+  {
+    id: 'wheals',
+    word: 'wheals',
+    phoneticTh: 'วีลส์',
+    meaning: 'ตุ่มนูนแดงคัน / รอยนูนบวมของลมพิษ',
+    category: 'ระบบผิวหนังและภูมิแพ้',
+    relatedGroup: 'รอยโรคปฐมภูมิและทุติยภูมิ (Dermatological Lesions)',
+    tags: ['ตุ่มนูน', 'รอยลมพิษ'],
+    connectedWordIds: ['urticaria', 'papules', 'pruritus', 'rash']
+  },
+  {
+    id: 'wheeze',
+    word: 'wheeze',
+    phoneticTh: 'วีซ',
+    meaning: 'เสียงหวีด (เสียงหายใจแหลมยาวเกิดจากหลอดลมส่วนล่างตีบแคบ เช่น หอบหืด)',
+    category: 'ระบบทางเดินหายใจ',
+    relatedGroup: 'อาการไอและเสียงหายใจ (Cough & Respiratory Sounds)',
+    tags: ['เสียงหวีด', 'หายใจมีเสียงหวีด', 'หอบหืด'],
+    connectedWordIds: ['crackles', 'stridor', 'stertor', 'dyspnea']
+  }
+];

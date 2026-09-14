@@ -1,0 +1,6 @@
+{
+  "name": "MedVoca - คำศัพท์อายุรศาสตร์",
+  "description": "เว็บแอปเรียนรู้คำศัพท์ทางอายุรศาสตร์ ตารางคำศัพท์เรียงอักษรพร้อมคำอ่าน หมวดหมู่คำศัพท์เชื่อมโยง แบบทดสอบ 4 ตัวเลือก และแบบฝึกฟังเสียงออกเสียงสไตล์ Duolingo",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

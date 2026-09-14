@@ -1,0 +1,53 @@
+{
+  "entities": {
+    "UserProfile": {
+      "collection": "users",
+      "fields": {
+        "id": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "lastActive": { "type": "number" },
+        "dailyGoalXp": { "type": "number" },
+        "avatarColor": { "type": "string" },
+        "stats": {
+          "type": "object",
+          "properties": {
+            "xp": { "type": "number" },
+            "streak": { "type": "number" },
+            "hearts": { "type": "number" },
+            "maxHearts": { "type": "number" },
+            "learnedWordsCount": { "type": "number" },
+            "totalQuizzesTaken": { "type": "number" },
+            "totalCorrectAnswers": { "type": "number" },
+            "totalQuestionsAnswered": { "type": "number" }
+          }
+        },
+        "bookmarkedIds": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "timestamp": { "type": "number" },
+              "dateFormatted": { "type": "string" },
+              "mode": { "type": "string" },
+              "modeTitle": { "type": "string" },
+              "score": { "type": "number" },
+              "total": { "type": "number" },
+              "percentage": { "type": "number" },
+              "xpGained": { "type": "number" },
+              "wordsReviewed": {
+                "type": "array"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
