@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { 
   BookOpen, 
   HelpCircle, 
@@ -13,10 +13,7 @@ import {
   ChevronDown,
   CreditCard,
   Keyboard,
-  Users,
-  LayoutGrid,
-  X,
-  Check
+  Users
 } from 'lucide-react';
 import { MainTab, UserStats, UserProfile } from '../types';
 import { soundManager } from '../utils/audio';
@@ -42,20 +39,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onToggleMute,
   onOpenAuth,
 }) => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  // Lock background body scroll when mobile menu is open
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [mobileMenuOpen]);
-
   const navTabs: { 
     id: MainTab; 
     label: string; 
@@ -114,13 +97,9 @@ export const Navbar: React.FC<NavbarProps> = ({
     },
   ];
 
-  const currentTabObj = navTabs.find((t) => t.id === currentTab) || navTabs[0];
-  const CurrentIcon = currentTabObj.icon;
-
   const handleSelectTab = (tabId: MainTab) => {
     soundManager.playClick();
     onSelectTab(tabId);
-    setMobileMenuOpen(false);
   };
 
   return (
@@ -243,109 +222,63 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Mobile Quick Mode Selector Bar (High Visibility on Phones) */}
-        <div className="md:hidden py-1.5 border-t border-[#E8EFF6] relative">
-          {/* Active Mode Button that opens the Full Mode List Dropdown */}
-          <button
-            id="btn-mobile-mode-switcher"
-            type="button"
-            onClick={() => {
-              soundManager.playClick();
-              setMobileMenuOpen(!mobileMenuOpen);
-            }}
-            className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-[#F0F5FA] border border-[#BAC7D5] text-[#102A43] text-xs font-bold shadow-2xs active:bg-[#E4ECF4] transition-all select-none"
-            aria-label="Toggle Learning Modes Menu"
-            aria-expanded={mobileMenuOpen}
-          >
-            <div className="flex items-center gap-2.5 truncate">
-              <div className="p-1.5 rounded-lg bg-[#486581] text-white shrink-0">
-                <CurrentIcon className="w-4 h-4" />
-              </div>
-              <div className="text-left truncate">
-                <span className="text-[10px] text-[#627D98] block uppercase tracking-wider font-semibold leading-none">
-                  โหมดปัจจุบัน (แตะเพื่อเปลี่ยนโหมด)
-                </span>
-                <span className="text-xs font-bold text-[#102A43] leading-tight truncate">
-                  {currentTabObj.label}
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center gap-1.5 text-[#486581] pl-2 shrink-0">
-              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${mobileMenuOpen ? 'rotate-180' : ''}`} />
-            </div>
-          </button>
-
-          {/* Mobile Mode List Dropdown (Opens directly below the button) */}
-          {mobileMenuOpen && (
-            <>
-              {/* Dark translucent backdrop that blocks background interactions and clicks */}
-              <div 
-                className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs animate-fade-in" 
-                onClick={() => setMobileMenuOpen(false)}
-                aria-hidden="true"
-              />
-              
-              {/* Dropdown List Container */}
-              <div className="absolute left-0 right-0 top-full mt-1.5 z-50 bg-white rounded-2xl border border-[#D2E0EC] shadow-2xl overflow-hidden animate-slide-up">
-                <div className="p-2.5 bg-[#F0F5FA] border-b border-[#E8EFF6] flex items-center justify-between">
-                  <span className="text-xs font-bold text-[#334E68] flex items-center gap-1.5">
-                    <LayoutGrid className="w-3.5 h-3.5 text-[#486581]" />
-                    เลือกโหมดการเรียนรู้ ({navTabs.length} โหมด)
+        {/* Mobile Learning Mode Bubbles (All modes visible directly without scrolling) */}
+        <div className="md:hidden py-2 border-t border-[#E8EFF6]">
+          {/* Row 1: 4 Mode Bubbles */}
+          <div className="grid grid-cols-4 gap-1.5">
+            {navTabs.slice(0, 4).map((tab) => {
+              const Icon = tab.icon;
+              const isActive = currentTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  id={`mobile-bubble-tab-${tab.id}`}
+                  type="button"
+                  onClick={() => handleSelectTab(tab.id)}
+                  className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all select-none text-center min-h-[48px] ${
+                    isActive
+                      ? 'bg-[#334E68] text-white shadow-xs font-bold ring-1 ring-[#243B53]'
+                      : 'bg-[#F0F5FA] text-[#334E68] hover:bg-[#E4ECF4] active:bg-[#D2E0EC] border border-[#D2E0EC] font-semibold'
+                  }`}
+                  aria-label={tab.label}
+                  aria-pressed={isActive}
+                >
+                  <Icon className={`w-3.5 h-3.5 mb-1 ${isActive ? 'text-white' : 'text-[#486581]'}`} />
+                  <span className="text-[10px] leading-tight truncate max-w-full font-medium">
+                    {tab.shortLabel}
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="text-[11px] font-semibold text-[#627D98] hover:text-[#102A43] px-2 py-0.5 rounded-md hover:bg-white"
-                  >
-                    ปิด
-                  </button>
-                </div>
+                </button>
+              );
+            })}
+          </div>
 
-                {/* Vertical list of modes - Scrollable if content exceeds height */}
-                <div className="max-h-[62vh] overflow-y-auto overscroll-contain p-2 space-y-1.5 divide-y divide-[#F0F5FA]">
-                  {navTabs.map((tab) => {
-                    const Icon = tab.icon;
-                    const isActive = currentTab === tab.id;
-                    return (
-                      <button
-                        key={tab.id}
-                        id={`mobile-menu-tab-${tab.id}`}
-                        type="button"
-                        onClick={() => handleSelectTab(tab.id)}
-                        className={`w-full flex items-center gap-3 p-2.5 rounded-xl text-left transition-all ${
-                          isActive
-                            ? 'bg-[#EBF2F7] border border-[#486581]/40 shadow-xs'
-                            : 'bg-white hover:bg-[#F8FAFC] active:bg-[#F0F5FA] border border-transparent'
-                        }`}
-                      >
-                        <div className={`p-2 rounded-xl shrink-0 ${
-                          isActive ? 'bg-[#486581] text-white shadow-xs' : 'bg-[#F0F5FA] text-[#486581]'
-                        }`}>
-                          <Icon className="w-4 h-4" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <span className={`text-xs font-bold ${isActive ? 'text-[#102A43]' : 'text-[#334E68]'}`}>
-                              {tab.label}
-                            </span>
-                            {isActive && (
-                              <span className="flex items-center gap-1 text-[11px] font-bold text-[#486581] bg-white px-2 py-0.5 rounded-full border border-[#D2E0EC] shrink-0">
-                                <Check className="w-3 h-3 text-[#486581]" />
-                                กำลังใช้งาน
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-[11px] text-[#627D98] mt-0.5 truncate leading-tight">
-                            {tab.description}
-                          </p>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </>
-          )}
+          {/* Row 2: 3 Mode Bubbles */}
+          <div className="grid grid-cols-3 gap-1.5 mt-1.5">
+            {navTabs.slice(4).map((tab) => {
+              const Icon = tab.icon;
+              const isActive = currentTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  id={`mobile-bubble-tab-${tab.id}`}
+                  type="button"
+                  onClick={() => handleSelectTab(tab.id)}
+                  className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all select-none text-center min-h-[48px] ${
+                    isActive
+                      ? 'bg-[#334E68] text-white shadow-xs font-bold ring-1 ring-[#243B53]'
+                      : 'bg-[#F0F5FA] text-[#334E68] hover:bg-[#E4ECF4] active:bg-[#D2E0EC] border border-[#D2E0EC] font-semibold'
+                  }`}
+                  aria-label={tab.label}
+                  aria-pressed={isActive}
+                >
+                  <Icon className={`w-3.5 h-3.5 mb-1 ${isActive ? 'text-white' : 'text-[#486581]'}`} />
+                  <span className="text-[10px] leading-tight truncate max-w-full font-medium">
+                    {tab.shortLabel}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Navigation Tabs - Desktop Only (on mobile, user taps the dropdown button to expand the list) */}
