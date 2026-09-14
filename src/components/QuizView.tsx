@@ -13,7 +13,9 @@ import {
   ArrowRight,
   HelpCircle,
   Check,
-  RotateCw
+  RotateCw,
+  ChevronDown,
+  Filter
 } from 'lucide-react';
 import { VocabItem, QuizQuestion, QuizQuestionMode, HistoryWordItem } from '../types';
 import { SYSTEM_CATEGORIES } from '../data';
@@ -39,6 +41,19 @@ export const QuizView: React.FC<QuizViewProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [questionCount, setQuestionCount] = useState<number>(10);
   const [isStarted, setIsStarted] = useState<boolean>(false);
+  const [mobileCatDropdownOpen, setMobileCatDropdownOpen] = useState<boolean>(false);
+
+  // Lock background scroll when mobile dropdown is open
+  useEffect(() => {
+    if (mobileCatDropdownOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileCatDropdownOpen]);
 
   // Active Quiz State
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
@@ -300,7 +315,85 @@ export const QuizView: React.FC<QuizViewProps> = ({
             <label className="text-xs font-bold text-[#486581] uppercase tracking-wider block">
               2. เลือกหมวดหมู่ระบบอวัยวะ:
             </label>
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+
+            {/* Mobile Category Dropdown Button */}
+            <div className="md:hidden">
+              <button
+                id="btn-quiz-mobile-cat"
+                type="button"
+                onClick={() => {
+                  soundManager.playClick();
+                  setMobileCatDropdownOpen(!mobileCatDropdownOpen);
+                }}
+                className="w-full flex items-center justify-between p-3 rounded-xl bg-[#F0F5FA] border border-[#D2E0EC] text-[#102A43] text-xs font-bold active:bg-[#E4ECF4] transition-colors"
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <Filter className="w-3.5 h-3.5 text-[#486581] shrink-0" />
+                  <span className="text-[#627D98] font-normal">หมวดหมู่:</span>
+                  <span className="truncate text-[#102A43]">
+                    {selectedCategory === 'all'
+                      ? `ทุกหมวดหมู่ (${allVocab.length})`
+                      : SYSTEM_CATEGORIES.find(c => c.id === selectedCategory)?.nameTh || selectedCategory}
+                  </span>
+                </div>
+                <ChevronDown className={`w-4 h-4 text-[#486581] transition-transform duration-200 shrink-0 ${mobileCatDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Mobile Expanded List */}
+              {mobileCatDropdownOpen && (
+                <>
+                  {/* Backdrop to close when tapping outside */}
+                  <div 
+                    className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs animate-fade-in" 
+                    onClick={() => setMobileCatDropdownOpen(false)}
+                    aria-hidden="true"
+                  />
+                  <div className="mt-1.5 p-2 bg-white rounded-xl border border-[#D2E0EC] shadow-2xl max-h-60 overflow-y-auto space-y-1 animate-slide-up z-50 relative">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        soundManager.playClick();
+                        setSelectedCategory('all');
+                        setMobileCatDropdownOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between p-2.5 rounded-lg text-xs font-semibold text-left transition-colors ${
+                        selectedCategory === 'all'
+                          ? 'bg-[#486581] text-white font-bold'
+                          : 'text-[#334E68] hover:bg-[#F0F5FA]'
+                      }`}
+                    >
+                      <span>ทุกหมวดหมู่ ({allVocab.length})</span>
+                      {selectedCategory === 'all' && <Check className="w-3.5 h-3.5 text-white" />}
+                    </button>
+                    {SYSTEM_CATEGORIES.map((cat) => {
+                      const isSelected = selectedCategory === cat.id;
+                      return (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          onClick={() => {
+                            soundManager.playClick();
+                            setSelectedCategory(cat.id);
+                            setMobileCatDropdownOpen(false);
+                          }}
+                          className={`w-full flex items-center justify-between p-2.5 rounded-lg text-xs font-semibold text-left transition-colors ${
+                            isSelected
+                              ? 'bg-[#486581] text-white font-bold'
+                              : 'text-[#334E68] hover:bg-[#F0F5FA]'
+                          }`}
+                        >
+                          <span>{cat.nameTh}</span>
+                          {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Desktop Category Pills */}
+            <div className="hidden md:flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
               <button
                 type="button"
                 onClick={() => {
@@ -340,7 +433,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
             <label className="text-xs font-bold text-[#486581] uppercase tracking-wider block">
               3. จำนวนข้อ:
             </label>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {[5, 10, 15, 20, -1].map((count) => (
                 <button
                   key={count}
@@ -349,7 +442,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
                     soundManager.playClick();
                     setQuestionCount(count);
                   }}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-colors border ${
+                  className={`flex-1 sm:flex-none px-3.5 py-2 rounded-xl text-xs font-bold transition-colors border text-center ${
                     questionCount === count
                       ? 'bg-[#486581] text-white border-[#486581]'
                       : 'bg-[#F0F5FA] text-[#486581] border-[#D2E0EC] hover:bg-[#E4ECF4]'

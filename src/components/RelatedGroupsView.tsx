@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Layers, 
   Sparkles, 
   HelpCircle, 
   Volume2, 
-  Snail,
+  Snail, 
   ArrowRight, 
-  BookMarked
+  BookMarked,
+  ChevronDown,
+  Filter,
+  Check
 } from 'lucide-react';
 import { VocabItem } from '../types';
 import { RELATED_CLUSTERS, VOCAB_MAP } from '../data';
@@ -40,6 +43,19 @@ export const RelatedGroupsView: React.FC<RelatedGroupsViewProps> = ({
 }) => {
   const [selectedClusterId, setSelectedClusterId] = useState<string>(RELATED_CLUSTERS[0].id);
   const [activeTab, setActiveTab] = useState<'clusters' | 'affixes'>('clusters');
+  const [mobileClusterDropdownOpen, setMobileClusterDropdownOpen] = useState(false);
+
+  // Lock background scroll when mobile dropdown is open
+  useEffect(() => {
+    if (mobileClusterDropdownOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileClusterDropdownOpen]);
 
   const selectedCluster = RELATED_CLUSTERS.find(c => c.id === selectedClusterId) || RELATED_CLUSTERS[0];
   const clusterWords = selectedCluster.wordIds
@@ -69,27 +85,27 @@ export const RelatedGroupsView: React.FC<RelatedGroupsViewProps> = ({
         </div>
 
         {/* View Mode Toggle */}
-        <div className="flex bg-[#F0F5FA] p-1 rounded-xl text-sm font-semibold shrink-0 border border-[#D2E0EC]">
+        <div className="w-full sm:w-auto grid grid-cols-2 sm:flex bg-[#F0F5FA] p-1 rounded-xl text-sm font-semibold shrink-0 border border-[#D2E0EC]">
           <button
             onClick={() => {
               soundManager.playClick();
               setActiveTab('clusters');
             }}
-            className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 ${
+            className={`px-3.5 py-2 rounded-lg transition-colors flex items-center justify-center gap-1.5 text-xs sm:text-sm ${
               activeTab === 'clusters'
                 ? 'bg-white text-[#102A43] shadow-xs font-bold'
                 : 'text-[#627D98] hover:text-[#102A43]'
             }`}
           >
             <Layers className="w-4 h-4" />
-            <span>กลุ่มโรคสัมพันธ์ ({RELATED_CLUSTERS.length})</span>
+            <span>กลุ่มโรค ({RELATED_CLUSTERS.length})</span>
           </button>
           <button
             onClick={() => {
               soundManager.playClick();
               setActiveTab('affixes');
             }}
-            className={`px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 ${
+            className={`px-3.5 py-2 rounded-lg transition-colors flex items-center justify-center gap-1.5 text-xs sm:text-sm ${
               activeTab === 'affixes'
                 ? 'bg-white text-[#102A43] shadow-xs font-bold'
                 : 'text-[#627D98] hover:text-[#102A43]'
@@ -102,9 +118,74 @@ export const RelatedGroupsView: React.FC<RelatedGroupsViewProps> = ({
       </div>
 
       {activeTab === 'clusters' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left: Cluster List */}
-          <div className="lg:col-span-4 bg-white p-4 rounded-2xl border border-[#D2E0EC] shadow-xs space-y-2">
+        <div className="space-y-4 lg:space-y-0 lg:grid lg:grid-cols-12 lg:gap-6 items-start">
+          {/* Mobile Cluster Dropdown */}
+          <div className="lg:hidden space-y-2">
+            <button
+              id="btn-mobile-cluster-dropdown"
+              type="button"
+              onClick={() => {
+                soundManager.playClick();
+                setMobileClusterDropdownOpen(!mobileClusterDropdownOpen);
+              }}
+              className="w-full flex items-center justify-between p-3.5 rounded-xl bg-white border border-[#D2E0EC] text-[#102A43] text-sm font-bold shadow-xs active:bg-[#F0F5FA] transition-colors"
+            >
+              <div className="flex items-center gap-2 truncate">
+                <Filter className="w-4 h-4 text-[#486581] shrink-0" />
+                <span className="text-[#627D98] font-normal text-xs">กลุ่มโรค:</span>
+                <span className="truncate font-bold text-[#102A43]">
+                  {selectedCluster.titleTh} ({selectedCluster.wordIds.length} คำ)
+                </span>
+              </div>
+              <ChevronDown className={`w-4 h-4 text-[#486581] transition-transform duration-200 shrink-0 ${mobileClusterDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {mobileClusterDropdownOpen && (
+              <>
+                {/* Backdrop to close when tapping outside */}
+                <div 
+                  className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs animate-fade-in" 
+                  onClick={() => setMobileClusterDropdownOpen(false)}
+                  aria-hidden="true"
+                />
+                <div className="mt-1.5 p-2 bg-white rounded-xl border border-[#D2E0EC] shadow-2xl max-h-72 overflow-y-auto space-y-1 animate-slide-up z-50 relative">
+                  {RELATED_CLUSTERS.map((cluster) => {
+                    const isSelected = cluster.id === selectedClusterId;
+                    return (
+                      <button
+                        key={cluster.id}
+                        type="button"
+                        onClick={() => {
+                          soundManager.playClick();
+                          setSelectedClusterId(cluster.id);
+                          setMobileClusterDropdownOpen(false);
+                        }}
+                        className={`w-full flex items-center justify-between p-3 rounded-lg text-xs transition-colors text-left ${
+                          isSelected
+                            ? 'bg-[#334E68] text-white font-bold'
+                            : 'text-[#334E68] hover:bg-[#F0F5FA]'
+                        }`}
+                      >
+                        <div className="min-w-0 pr-2">
+                          <p className="font-bold truncate">{cluster.titleTh}</p>
+                          <p className={`text-[11px] truncate ${isSelected ? 'text-[#D2E0EC]' : 'text-[#627D98]'}`}>{cluster.titleEn}</p>
+                        </div>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${isSelected ? 'bg-[#102A43] text-white' : 'bg-[#E4ECF4] text-[#334E68]'}`}>
+                            {cluster.wordIds.length} คำ
+                          </span>
+                          {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Desktop: Cluster List Sidebar */}
+          <div className="hidden lg:block lg:col-span-4 bg-white p-4 rounded-2xl border border-[#D2E0EC] shadow-xs space-y-2">
             <h3 className="text-xs font-bold text-[#829AB1] uppercase tracking-wider px-2">
               เลือกกลุ่มรอยโรค
             </h3>

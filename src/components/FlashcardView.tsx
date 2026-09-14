@@ -12,13 +12,15 @@ import {
   Sparkles, 
   Layers, 
   ArrowLeft, 
-  ArrowRight,
-  Eye,
-  EyeOff,
-  SlidersHorizontal,
-  CreditCard,
-  CheckCircle2,
-  Volume1
+  ArrowRight, 
+  Eye, 
+  EyeOff, 
+  SlidersHorizontal, 
+  CreditCard, 
+  CheckCircle2, 
+  Volume1,
+  ChevronDown,
+  Filter
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { VocabItem, FlashcardFrontMode, HistoryWordItem } from '../types';
@@ -46,6 +48,19 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [frontMode, setFrontMode] = useState<FlashcardFrontMode>('en'); // 'en' = English front, 'th' = Thai meaning front
   const [showOnlyBookmarks, setShowOnlyBookmarks] = useState(false);
+  const [mobileCatDropdownOpen, setMobileCatDropdownOpen] = useState(false);
+
+  // Lock background scroll when mobile dropdown is open
+  useEffect(() => {
+    if (mobileCatDropdownOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileCatDropdownOpen]);
 
   // Deck state
   const [deck, setDeck] = useState<VocabItem[]>([]);
@@ -251,55 +266,147 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
         </div>
 
         {/* Category selector & actions row */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 border-t border-[#E8EFF6]">
-          {/* Category Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar flex-1">
-            <button
-              onClick={() => {
-                soundManager.playClick();
-                setSelectedCategory('all');
-              }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-colors border ${
-                selectedCategory === 'all'
-                  ? 'bg-[#334E68] text-white border-[#334E68]'
-                  : 'bg-[#F0F5FA] text-[#486581] border-[#D2E0EC] hover:bg-[#E4ECF4]'
-              }`}
-            >
-              ทุกหมวดหมู่ ({allVocab.length})
-            </button>
-            {SYSTEM_CATEGORIES.map((cat) => (
+        <div className="pt-3 border-t border-[#E8EFF6] space-y-2.5">
+          {/* Mobile Category Dropdown Button */}
+          <div className="md:hidden space-y-2">
+            <div className="flex items-center gap-2">
               <button
-                key={cat.id}
+                id="btn-flashcard-mobile-cat"
+                type="button"
                 onClick={() => {
                   soundManager.playClick();
-                  setSelectedCategory(cat.id);
+                  setMobileCatDropdownOpen(!mobileCatDropdownOpen);
+                }}
+                className="flex-1 flex items-center justify-between p-3 rounded-xl bg-[#F0F5FA] border border-[#D2E0EC] text-[#102A43] text-xs font-bold active:bg-[#E4ECF4] transition-colors"
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <Filter className="w-3.5 h-3.5 text-[#486581] shrink-0" />
+                  <span className="text-[#627D98] font-normal">หมวดหมู่:</span>
+                  <span className="truncate text-[#102A43]">
+                    {selectedCategory === 'all'
+                      ? `ทุกหมวดหมู่ (${allVocab.length})`
+                      : SYSTEM_CATEGORIES.find(c => c.id === selectedCategory)?.nameTh || selectedCategory}
+                  </span>
+                </div>
+                <ChevronDown className={`w-4 h-4 text-[#486581] transition-transform duration-200 shrink-0 ${mobileCatDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              <button
+                onClick={() => {
+                  soundManager.playClick();
+                  initDeck();
+                }}
+                className="p-3 rounded-xl bg-[#F0F5FA] hover:bg-[#E4ECF4] border border-[#D2E0EC] text-[#486581] transition-colors shrink-0 flex items-center gap-1.5"
+                title="สลับสับการ์ดใหม่"
+              >
+                <Shuffle className="w-4 h-4" />
+                <span className="text-xs font-bold">{deck.length} การ์ด</span>
+              </button>
+            </div>
+
+            {/* Mobile Expanded List */}
+            {mobileCatDropdownOpen && (
+              <>
+                {/* Backdrop to close when tapping outside */}
+                <div 
+                  className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs animate-fade-in" 
+                  onClick={() => setMobileCatDropdownOpen(false)}
+                  aria-hidden="true"
+                />
+                <div className="mt-1.5 p-2 bg-white rounded-xl border border-[#D2E0EC] shadow-2xl max-h-60 overflow-y-auto space-y-1 animate-slide-up z-50 relative">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      soundManager.playClick();
+                      setSelectedCategory('all');
+                      setMobileCatDropdownOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between p-2.5 rounded-lg text-xs font-semibold text-left transition-colors ${
+                      selectedCategory === 'all'
+                        ? 'bg-[#486581] text-white font-bold'
+                        : 'text-[#334E68] hover:bg-[#F0F5FA]'
+                    }`}
+                  >
+                    <span>ทุกหมวดหมู่ ({allVocab.length})</span>
+                    {selectedCategory === 'all' && <Check className="w-3.5 h-3.5 text-white" />}
+                  </button>
+                  {SYSTEM_CATEGORIES.map((cat) => {
+                    const isSelected = selectedCategory === cat.id;
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => {
+                          soundManager.playClick();
+                          setSelectedCategory(cat.id);
+                          setMobileCatDropdownOpen(false);
+                        }}
+                        className={`w-full flex items-center justify-between p-2.5 rounded-lg text-xs font-semibold text-left transition-colors ${
+                          isSelected
+                            ? 'bg-[#486581] text-white font-bold'
+                            : 'text-[#334E68] hover:bg-[#F0F5FA]'
+                        }`}
+                      >
+                        <span>{cat.nameTh}</span>
+                        {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Desktop Category Pills Bar */}
+          <div className="hidden md:flex items-center justify-between gap-3">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar flex-1">
+              <button
+                onClick={() => {
+                  soundManager.playClick();
+                  setSelectedCategory('all');
                 }}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-colors border ${
-                  selectedCategory === cat.id
+                  selectedCategory === 'all'
                     ? 'bg-[#334E68] text-white border-[#334E68]'
                     : 'bg-[#F0F5FA] text-[#486581] border-[#D2E0EC] hover:bg-[#E4ECF4]'
                 }`}
               >
-                {cat.nameTh}
+                ทุกหมวดหมู่ ({allVocab.length})
               </button>
-            ))}
-          </div>
+              {SYSTEM_CATEGORIES.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => {
+                    soundManager.playClick();
+                    setSelectedCategory(cat.id);
+                  }}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-colors border ${
+                    selectedCategory === cat.id
+                      ? 'bg-[#334E68] text-white border-[#334E68]'
+                      : 'bg-[#F0F5FA] text-[#486581] border-[#D2E0EC] hover:bg-[#E4ECF4]'
+                  }`}
+                >
+                  {cat.nameTh}
+                </button>
+              ))}
+            </div>
 
-          {/* Shuffle & Reset button */}
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={() => {
-                soundManager.playClick();
-                initDeck();
-              }}
-              className="p-2 rounded-xl bg-[#F0F5FA] hover:bg-[#E4ECF4] border border-[#D2E0EC] text-[#486581] transition-colors"
-              title="สลับสับการ์ดใหม่"
-            >
-              <Shuffle className="w-4 h-4" />
-            </button>
-            <span className="text-xs font-bold text-[#627D98]">
-              {deck.length} การ์ด
-            </span>
+            {/* Shuffle & Reset button */}
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => {
+                  soundManager.playClick();
+                  initDeck();
+                }}
+                className="p-2 rounded-xl bg-[#F0F5FA] hover:bg-[#E4ECF4] border border-[#D2E0EC] text-[#486581] transition-colors"
+                title="สลับสับการ์ดใหม่"
+              >
+                <Shuffle className="w-4 h-4" />
+              </button>
+              <span className="text-xs font-bold text-[#627D98]">
+                {deck.length} การ์ด
+              </span>
+            </div>
           </div>
         </div>
       </div>
