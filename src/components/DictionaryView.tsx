@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { VocabItem } from '../types';
 import { SYSTEM_CATEGORIES } from '../data';
-import { speakWord, soundManager } from '../utils/audio';
+import { speakWord, speakThai, soundManager } from '../utils/audio';
 
 interface DictionaryViewProps {
   vocabList: VocabItem[];
@@ -75,6 +75,14 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
     soundManager.playClick();
     setActiveSpeechId(`${id}_${slow ? 'slow' : 'norm'}`);
     await speakWord(text, slow);
+    setActiveSpeechId(null);
+  };
+
+  const handlePronounceThai = async (e: React.MouseEvent, text: string, id: string) => {
+    e.stopPropagation();
+    soundManager.playClick();
+    setActiveSpeechId(`${id}_th`);
+    await speakThai(text, false);
     setActiveSpeechId(null);
   };
 
@@ -308,9 +316,24 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
 
                       {/* Thai Phonetic (Loopless) */}
                       <td className="py-4 px-4">
-                        <span className="text-[#334E68] font-semibold text-sm sm:text-base">
-                          {item.phoneticTh}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[#334E68] font-semibold text-sm sm:text-base">
+                            {item.phoneticTh}
+                          </span>
+                          <button
+                            id={`btn-pronounce-th-${item.id}`}
+                            onClick={(e) => handlePronounceThai(e, item.phoneticTh, item.id)}
+                            className={`p-1 rounded-md transition-colors ${
+                              activeSpeechId === `${item.id}_th`
+                                ? 'bg-[#006270] text-white'
+                                : 'text-[#006270] hover:bg-[#E0FCFF]'
+                            }`}
+                            title="ฟังเสียงสำเนียงไทย"
+                            aria-label="Thai pronunciation"
+                          >
+                            <Volume1 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
 
                       {/* Thai Meaning */}

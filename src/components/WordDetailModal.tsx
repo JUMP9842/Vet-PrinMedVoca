@@ -2,6 +2,7 @@ import React from 'react';
 import { 
   X, 
   Volume2, 
+  Volume1,
   Snail, 
   Bookmark, 
   BookmarkCheck, 
@@ -12,7 +13,7 @@ import {
 } from 'lucide-react';
 import { VocabItem } from '../types';
 import { VOCAB_MAP } from '../data';
-import { speakWord, soundManager } from '../utils/audio';
+import { speakWord, speakThai, soundManager } from '../utils/audio';
 
 interface WordDetailModalProps {
   word: VocabItem | null;
@@ -40,6 +41,11 @@ export const WordDetailModal: React.FC<WordDetailModalProps> = ({
   const handlePronounce = async (slow: boolean = false) => {
     soundManager.playClick();
     await speakWord(word.word, slow);
+  };
+
+  const handlePronounceThai = async () => {
+    soundManager.playClick();
+    await speakThai(word.phoneticTh, false);
   };
 
   return (
@@ -92,9 +98,19 @@ export const WordDetailModal: React.FC<WordDetailModalProps> = ({
                 <h2 className="text-2xl sm:text-3xl font-bold text-[#102A43]">
                   {word.word}
                 </h2>
-                <p className="text-sm sm:text-base font-semibold text-[#334E68] mt-1">
-                  คำอ่านไทย: <span className="text-[#006270] font-bold">{word.phoneticTh}</span>
-                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-sm sm:text-base font-semibold text-[#334E68]">
+                    คำอ่านไทย: <span className="text-[#006270] font-bold">{word.phoneticTh}</span>
+                  </p>
+                  <button
+                    id="modal-speak-thai"
+                    onClick={handlePronounceThai}
+                    className="p-1 rounded-md text-[#006270] hover:bg-[#E0FCFF] transition-colors"
+                    title="ฟังเสียงสำเนียงไทย"
+                  >
+                    <Volume1 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
               {/* Speaker Audio Buttons */}

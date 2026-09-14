@@ -152,42 +152,220 @@ class SoundManager {
 
 export const soundManager = new SoundManager();
 
+let activeAudioElement: HTMLAudioElement | null = null;
+
+// Stop any ongoing speech or audio element playback
+export function stopAllSpeech() {
+  if (activeAudioElement) {
+    try {
+      activeAudioElement.pause();
+      activeAudioElement.currentTime = 0;
+    } catch {
+      // ignore
+    }
+    activeAudioElement = null;
+  }
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    try {
+      window.speechSynthesis.cancel();
+    } catch {
+      // ignore
+    }
+  }
+}
+
+// Helper to play audio via cloud TTS endpoint (high-fidelity human voice)
+function playCloudTtsAudio(text: string, lang: 'th' | 'en', speed: number = 1.0): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined') {
+      resolve(false);
+      return;
+    }
+
+    try {
+      stopAllSpeech();
+
+      // Clean text for speech synthesis API
+      const cleanText = text
+        .replace(/\(.*?\)/g, '')
+        .replace(/[-/]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      if (!cleanText) {
+        resolve(false);
+        return;
+      }
+
+      const encoded = encodeURIComponent(cleanText);
+      const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=tw-ob&q=${encoded}`;
+
+      const audio = new Audio();
+      activeAudioElement = audio;
+
+      audio.playbackRate = Math.max(0.5, Math.min(2.0, speed));
+
+      let resolved = false;
+      const finish = (success: boolean) => {
+        if (!resolved) {
+          resolved = true;
+          if (activeAudioElement === audio) {
+            activeAudioElement = null;
+          }
+          resolve(success);
+        }
+      };
+
+      // Set timeout in case network stalls
+      const timeoutTimer = setTimeout(() => {
+        finish(false);
+      }, 4000);
+
+      audio.onended = () => {
+        clearTimeout(timeoutTimer);
+        finish(true);
+      };
+
+      audio.onerror = () => {
+        clearTimeout(timeoutTimer);
+        finish(false);
+      };
+
+      audio.src = url;
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          clearTimeout(timeoutTimer);
+          finish(false);
+        });
+      }
+    } catch {
+      resolve(false);
+    }
+  });
+}
+
 // Speech Synthesis for English pronunciation with Slow mode
-export function speakWord(text: string, slow: boolean = false): Promise<void> {
+export async function speakWord(text: string, slow: boolean = false): Promise<void> {
+  const speed = slow ? 0.65 : 1.0;
+  
+  // Try cloud audio TTS first for crystal clear pronunciation
+  const cloudSuccess = await playCloudTtsAudio(text, 'en', speed);
+  if (cloudSuccess) return;
+
+  // Fallback to Web Speech Synthesis API
   return new Promise((resolve) => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
       resolve();
       return;
     }
 
-    // Cancel any current speaking
-    window.speechSynthesis.cancel();
+    try {
+      window.speechSynthesis.cancel();
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
 
-    // Clean word for clear speech
-    const cleanText = text
-      .replace(/:.*/g, '')
-      .replace(/\(.*\)/g, '')
-      .trim();
+      const cleanText = text
+        .replace(/:.*/g, '')
+        .replace(/\(.*\)/g, '')
+        .trim();
 
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = 'en-US';
-    // Slow speed: 0.55 for distinct phoneme enunciation; Normal speed: 0.9
-    utterance.rate = slow ? 0.55 : 0.9;
-    utterance.pitch = 1.0;
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.lang = 'en-US';
+      utterance.rate = slow ? 0.55 : 0.9;
+      utterance.pitch = 1.0;
 
-    // Search for high quality English voice
-    const voices = window.speechSynthesis.getVoices();
-    const englishVoice = voices.find(
-      (v) => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('US'))
-    ) || voices.find((v) => v.lang.startsWith('en'));
+      const voices = window.speechSynthesis.getVoices();
+      const englishVoice = voices.find(
+        (v) => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('US'))
+      ) || voices.find((v) => v.lang.startsWith('en'));
 
-    if (englishVoice) {
-      utterance.voice = englishVoice;
+      if (englishVoice) {
+        utterance.voice = englishVoice;
+      }
+
+      let done = false;
+      const doneCallback = () => {
+        if (!done) {
+          done = true;
+          resolve();
+        }
+      };
+
+      utterance.onend = doneCallback;
+      utterance.onerror = doneCallback;
+
+      // Fail-safe timer
+      setTimeout(doneCallback, 4000);
+
+      window.speechSynthesis.speak(utterance);
+    } catch {
+      resolve();
+    }
+  });
+}
+
+// Speech Synthesis for Thai pronunciation with authentic Thai accent
+export async function speakThai(text: string, slow: boolean = false): Promise<void> {
+  const speed = slow ? 0.75 : 1.0;
+  
+  // Clean text: strip parenthesis annotations, convert hyphens/slashes in phonetic words into smooth Thai syllables
+  const cleanText = text
+    .replace(/\(.*?\)/g, '')
+    .replace(/[-/]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Try cloud audio TTS first for native Thai speech and tone
+  const cloudSuccess = await playCloudTtsAudio(cleanText, 'th', speed);
+  if (cloudSuccess) return;
+
+  // Fallback to Web Speech Synthesis API
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      resolve();
+      return;
     }
 
-    utterance.onend = () => resolve();
-    utterance.onerror = () => resolve();
+    try {
+      window.speechSynthesis.cancel();
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
 
-    window.speechSynthesis.speak(utterance);
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.lang = 'th-TH';
+      utterance.rate = slow ? 0.75 : 0.95;
+      utterance.pitch = 1.0;
+
+      const voices = window.speechSynthesis.getVoices();
+      const thaiVoice = voices.find(
+        (v) => (v.lang === 'th-TH' || v.lang.startsWith('th')) && 
+               (v.name.includes('Premwadee') || v.name.includes('Kanya') || v.name.includes('Google') || v.name.includes('Thai') || v.name.includes('Siri') || v.name.includes('Narisa') || v.name.includes('Achara'))
+      ) || voices.find((v) => v.lang.startsWith('th') || v.lang.includes('th') || v.lang === 'th-TH');
+
+      if (thaiVoice) {
+        utterance.voice = thaiVoice;
+      }
+
+      let done = false;
+      const doneCallback = () => {
+        if (!done) {
+          done = true;
+          resolve();
+        }
+      };
+
+      utterance.onend = doneCallback;
+      utterance.onerror = doneCallback;
+
+      // Fail-safe timer
+      setTimeout(doneCallback, 4000);
+
+      window.speechSynthesis.speak(utterance);
+    } catch {
+      resolve();
+    }
   });
 }

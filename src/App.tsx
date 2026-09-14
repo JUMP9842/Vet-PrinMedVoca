@@ -4,6 +4,8 @@ import { VocabItem, MainTab, UserProfile, HistoryWordItem } from './types';
 import { Navbar } from './components/Navbar';
 import { DictionaryView } from './components/DictionaryView';
 import { RelatedGroupsView } from './components/RelatedGroupsView';
+import { FlashcardView } from './components/FlashcardView';
+import { TypingPracticeView } from './components/TypingPracticeView';
 import { QuizView } from './components/QuizView';
 import { AudioPracticeView } from './components/AudioPracticeView';
 import { HistoryView } from './components/HistoryView';
@@ -14,6 +16,7 @@ import {
   getSavedActiveUserId,
   fetchUserFromFirestore,
   subscribeToUserProfile,
+  subscribeToTotalUsersCount,
   addHistoryRecordAndSync,
   toggleBookmarkAndSync
 } from './utils/auth';
@@ -22,9 +25,17 @@ import { soundManager } from './utils/audio';
 export function App() {
   const [currentTab, setCurrentTab] = useState<MainTab>('dictionary');
   const [selectedWordDetail, setSelectedWordDetail] = useState<VocabItem | null>(null);
+  
+  // Custom word sets for study modes
   const [quizWordSet, setQuizWordSet] = useState<VocabItem[] | null>(null);
   const [audioPracticeWordSet, setAudioPracticeWordSet] = useState<VocabItem[] | null>(null);
+  const [flashcardWordSet, setFlashcardWordSet] = useState<VocabItem[] | null>(null);
+  const [typingWordSet, setTypingWordSet] = useState<VocabItem[] | null>(null);
+  
   const [isMuted, setIsMuted] = useState<boolean>(false);
+
+  // Total registered users across the platform
+  const [totalUsersCount, setTotalUsersCount] = useState<number>(0);
 
   // Active User Profile - null if no previous login on this machine/device
   const [activeUser, setActiveUser] = useState<UserProfile | null>(() => getCachedActiveUser());
@@ -34,18 +45,26 @@ export function App() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalInitialMode, setAuthModalInitialMode] = useState<'signin' | 'signup' | 'switch'>('signin');
 
+  // Synchronize total registered users count in real-time
+  useEffect(() => {
+    const unsubUsers = subscribeToTotalUsersCount((count) => {
+      setTotalUsersCount(count);
+    });
+    return () => {
+      unsubUsers();
+    };
+  }, []);
+
   // Synchronize active user from Firestore on initial mount
   useEffect(() => {
     const savedUserId = getSavedActiveUserId();
     if (savedUserId) {
-      // 1. Fetch latest profile
       fetchUserFromFirestore(savedUserId).then((fetched) => {
         if (fetched) {
           setActiveUser(fetched);
         }
       });
 
-      // 2. Real-time listener for Firestore document
       const unsubscribe = subscribeToUserProfile(savedUserId, (updated) => {
         setActiveUser(updated);
       });
@@ -77,7 +96,6 @@ export function App() {
       const updated = await toggleBookmarkAndSync(activeUser, id);
       setActiveUser(updated);
     } else {
-      // Guest local bookmarks
       setGuestBookmarks((prev) => 
         prev.includes(id) ? prev.filter((bId) => bId !== id) : [...prev, id]
       );
@@ -95,6 +113,7 @@ export function App() {
     setAuthModalOpen(true);
   };
 
+  // History sync handlers
   const handleFinishQuiz = async (
     score: number, 
     total: number, 
@@ -115,7 +134,7 @@ export function App() {
     }
   };
 
-  const handleFinishPractice = async (
+  const handleFinishAudioPractice = async (
     score: number, 
     total: number, 
     xpGained: number, 
@@ -124,7 +143,47 @@ export function App() {
     if (activeUser) {
       const updated = await addHistoryRecordAndSync(activeUser, {
         mode: 'audio_practice',
-        modeTitle: audioPracticeWordSet ? `แบบฝึกฟังเสียงทบทวน (${total} ข้อ)` : `แบบฝึกฟังเสียงออกเสียง (${total} ข้อ)`,
+        modeTitle: audioPracticeWordSet ? `แบบฝึกฟังเสียงทบทวน (${total} ข้อ)` : `แบบฝึกฟังเสียง (${total} ข้อ)`,
+        score,
+        total,
+        percentage: Math.round((score / total) * 100),
+        xpGained,
+        wordsReviewed: reviewedWords,
+      });
+      setActiveUser(updated);
+    }
+  };
+
+  const handleFinishFlashcard = async (
+    score: number, 
+    total: number, 
+    xpGained: number, 
+    reviewedWords: HistoryWordItem[]
+  ) => {
+    if (activeUser) {
+      const updated = await addHistoryRecordAndSync(activeUser, {
+        mode: 'flashcard',
+        modeTitle: `ทบทวนการ์ดคำศัพท์ Flashcard (${total} คำ)`,
+        score,
+        total,
+        percentage: Math.round((score / total) * 100),
+        xpGained,
+        wordsReviewed: reviewedWords,
+      });
+      setActiveUser(updated);
+    }
+  };
+
+  const handleFinishTypingPractice = async (
+    score: number, 
+    total: number, 
+    xpGained: number, 
+    reviewedWords: HistoryWordItem[]
+  ) => {
+    if (activeUser) {
+      const updated = await addHistoryRecordAndSync(activeUser, {
+        mode: 'typing_practice',
+        modeTitle: typingWordSet ? `แบบฝึกพิมพ์ตอบทบทวน (${total} ข้อ)` : `แบบฝึกพิมพ์ตอบสะกดคำ (${total} ข้อ)`,
         score,
         total,
         percentage: Math.round((score / total) * 100),
@@ -145,6 +204,16 @@ export function App() {
     setCurrentTab('audio_practice');
   };
 
+  const handleStartFlashcardWithWords = (words?: VocabItem[]) => {
+    setFlashcardWordSet(words || null);
+    setCurrentTab('flashcard');
+  };
+
+  const handleStartTypingWithWords = (words?: VocabItem[]) => {
+    setTypingWordSet(words || null);
+    setCurrentTab('typing_practice');
+  };
+
   const handleQuickQuizSingleWord = (word: VocabItem) => {
     setSelectedWordDetail(null);
     setQuizWordSet([word, ...ALL_VOCAB.filter((w) => w.id !== word.id).slice(0, 9)]);
@@ -154,21 +223,20 @@ export function App() {
   const currentBookmarks = activeUser ? activeUser.bookmarkedIds : guestBookmarks;
 
   return (
-    <div className="min-h-screen bg-[#EDF3F8] text-[#1E2D3D] flex flex-col antialiased">
+    <div className="min-h-screen bg-[#EDF3F8] text-[#1E2D3D] flex flex-col antialiased font-sans">
       {/* Top Navbar */}
       <Navbar
         currentTab={currentTab}
         onSelectTab={(tab) => {
-          if (tab !== 'quiz') {
-            setQuizWordSet(null);
-          }
-          if (tab !== 'audio_practice') {
-            setAudioPracticeWordSet(null);
-          }
+          if (tab !== 'quiz') setQuizWordSet(null);
+          if (tab !== 'audio_practice') setAudioPracticeWordSet(null);
+          if (tab !== 'flashcard') setFlashcardWordSet(null);
+          if (tab !== 'typing_practice') setTypingWordSet(null);
           setCurrentTab(tab);
         }}
         stats={activeUser ? activeUser.stats : null}
         activeUser={activeUser}
+        totalUsersCount={totalUsersCount}
         isMuted={isMuted}
         onToggleMute={handleToggleMute}
         onOpenAuth={handleOpenAuth}
@@ -193,12 +261,34 @@ export function App() {
           />
         )}
 
+        {currentTab === 'flashcard' && (
+          <FlashcardView
+            allVocab={ALL_VOCAB}
+            bookmarkedIds={currentBookmarks}
+            onToggleBookmark={handleToggleBookmark}
+            onSelectWordDetail={setSelectedWordDetail}
+            onFinishDeck={handleFinishFlashcard}
+            customWordSet={flashcardWordSet}
+          />
+        )}
+
+        {currentTab === 'typing_practice' && (
+          <TypingPracticeView
+            allVocab={ALL_VOCAB}
+            bookmarkedIds={currentBookmarks}
+            onFinishSession={handleFinishTypingPractice}
+            customWordSet={typingWordSet}
+            onClearCustomSet={() => setTypingWordSet(null)}
+          />
+        )}
+
         {currentTab === 'quiz' && (
           <QuizView
             allVocab={ALL_VOCAB}
             customQuestionSet={quizWordSet}
             onFinishQuiz={handleFinishQuiz}
             onSelectWordDetail={setSelectedWordDetail}
+            onClearCustomSet={() => setQuizWordSet(null)}
           />
         )}
 
@@ -206,8 +296,9 @@ export function App() {
           <AudioPracticeView
             allVocab={ALL_VOCAB}
             customPracticeSet={audioPracticeWordSet}
-            onFinishPractice={handleFinishPractice}
+            onFinishPractice={handleFinishAudioPractice}
             onSelectWordDetail={setSelectedWordDetail}
+            onClearCustomSet={() => setAudioPracticeWordSet(null)}
           />
         )}
 
@@ -254,7 +345,7 @@ export function App() {
             MedVoca • ระบบเรียนรู้คำศัพท์อายุรศาสตร์และศัพท์การแพทย์
           </p>
           <p className="text-[#829AB1]">
-            เชื่อมต่อฐานข้อมูลคลาวด์ • ฟอนต์ภาษาไทยไม่มีหัว • รองรับการฟังเสียงปกติและความเร็วช้า (Slow Speed)
+            เชื่อมต่อฐานข้อมูลคลาวด์ • ฟอนต์ภาษาไทยไม่มีหัว • รองรับ Flashcard, พิมพ์ตอบ, ช้อยส์ 4 ตัวเลือก และฟังเสียงปกติ/ช้า
           </p>
         </div>
       </footer>

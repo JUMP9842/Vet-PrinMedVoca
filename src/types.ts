@@ -12,11 +12,22 @@ export interface VocabItem {
   note?: string;
 }
 
-export type MainTab = 'dictionary' | 'related_groups' | 'quiz' | 'audio_practice' | 'history';
+export type MainTab = 
+  | 'dictionary' 
+  | 'related_groups' 
+  | 'flashcard' 
+  | 'quiz' 
+  | 'typing_practice' 
+  | 'audio_practice' 
+  | 'history';
 
-export type QuizModeType = 'en_to_th' | 'th_to_en';
+export type QuizQuestionMode = 'en_to_th' | 'th_to_en';
 
-export type AudioPracticeMode = 'choice' | 'typing';
+export type TypingMode = 'en_to_th' | 'th_to_en';
+
+export type AudioPracticeType = 'choice' | 'typing';
+
+export type FlashcardFrontMode = 'en' | 'th';
 
 export interface QuizQuestion {
   id: string;
@@ -25,6 +36,7 @@ export interface QuizQuestion {
   choices: string[];
   correctChoiceIndex: number;
   phoneticHint?: string;
+  mode: QuizQuestionMode;
 }
 
 export interface UserStats {
@@ -44,13 +56,15 @@ export interface HistoryWordItem {
   meaning: string;
   isCorrect: boolean;
   chosenAnswer?: string;
+  userTyped?: string;
+  correctAnswer?: string;
 }
 
 export interface PracticeHistoryRecord {
   id: string;
   timestamp: number;
   dateFormatted: string;
-  mode: 'quiz' | 'audio_practice';
+  mode: 'quiz' | 'audio_practice' | 'typing_practice' | 'flashcard';
   modeTitle: string;
   score: number;
   total: number;
@@ -62,7 +76,9 @@ export interface PracticeHistoryRecord {
 
 export interface UserProfile {
   id: string;
-  email: string;
+  username: string;
+  password?: string;
+  email?: string;
   displayName: string;
   createdAt: number;
   lastActive: number;
