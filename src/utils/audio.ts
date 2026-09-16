@@ -32,19 +32,28 @@ class SoundManager {
     if (this.isUnlocked) return;
     try {
       const ctx = this.getAudioContext();
-      if (ctx && ctx.state === 'suspended') {
-        ctx.resume().catch(() => {});
+      if (ctx) {
+        if (ctx.state === 'suspended') {
+          ctx.resume().catch(() => {});
+        }
+        // Apple-recommended silent buffer to activate Web Audio on iOS Safari
+        try {
+          const buffer = ctx.createBuffer(1, 1, 22050);
+          const source = ctx.createBufferSource();
+          source.buffer = buffer;
+          source.connect(ctx.destination);
+          source.start(0);
+        } catch {
+          // ignore
+        }
       }
 
-      // Unlock SpeechSynthesis on iOS by speaking an empty silent utterance
+      // Resume SpeechSynthesis if paused on iOS
       if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
         try {
           if (window.speechSynthesis.paused) {
             window.speechSynthesis.resume();
           }
-          const silentUtterance = new SpeechSynthesisUtterance('');
-          silentUtterance.volume = 0;
-          window.speechSynthesis.speak(silentUtterance);
         } catch {
           // ignore
         }
@@ -208,6 +217,12 @@ export const soundManager = new SoundManager();
 let activeUtterance: SpeechSynthesisUtterance | null = null;
 let activeAudioElement: HTMLAudioElement | null = null;
 
+export function isIosDevice(): boolean {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
 // Stop any ongoing speech or audio element playback
 export function stopAllSpeech() {
   if (activeAudioElement) {
@@ -221,7 +236,12 @@ export function stopAllSpeech() {
   }
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     try {
-      window.speechSynthesis.cancel();
+      if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+        window.speechSynthesis.cancel();
+      }
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
     } catch {
       // ignore
     }
@@ -251,8 +271,48 @@ function getVoices(): SpeechSynthesisVoice[] {
   return cachedVoices;
 }
 
+// Helper for playing audio via HTML5 Audio
+function playAudioFallback(text: string, lang: 'en' | 'th', slow: boolean, onDone: () => void) {
+  try {
+    const encoded = encodeURIComponent(text);
+    const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=tw-ob&q=${encoded}`;
+    const audio = new Audio();
+    activeAudioElement = audio;
+    audio.playbackRate = slow ? (lang === 'th' ? 0.8 : 0.7) : 1.0;
+
+    let resolved = false;
+    const finish = () => {
+      if (!resolved) {
+        resolved = true;
+        if (activeAudioElement === audio) activeAudioElement = null;
+        onDone();
+      }
+    };
+
+    const timer = setTimeout(finish, 4000);
+    audio.onended = () => {
+      clearTimeout(timer);
+      finish();
+    };
+    audio.onerror = () => {
+      clearTimeout(timer);
+      finish();
+    };
+
+    audio.src = url;
+    const p = audio.play();
+    if (p !== undefined) {
+      p.catch(() => {
+        clearTimeout(timer);
+        finish();
+      });
+    }
+  } catch {
+    onDone();
+  }
+}
+
 // Speech Synthesis for English pronunciation with Slow mode
-// Immediate synchronous invocation to preserve iOS Safari user-gesture privilege
 export function speakWord(text: string, slow: boolean = false): Promise<void> {
   return new Promise((resolve) => {
     soundManager.unlock();
@@ -276,103 +336,80 @@ export function speakWord(text: string, slow: boolean = false): Promise<void> {
       return;
     }
 
-    // Native Web Speech API (supported on iOS Safari 7+, Chrome, Edge, Android)
+    let finished = false;
+    const finish = () => {
+      if (!finished) {
+        finished = true;
+        activeUtterance = null;
+        if (typeof window !== 'undefined') {
+          (window as unknown as { _currentUtterance?: SpeechSynthesisUtterance | null })._currentUtterance = null;
+        }
+        resolve();
+      }
+    };
+
+    // Native Web Speech API (supported on iOS Safari, Chrome, Edge, Android)
     if ('speechSynthesis' in window) {
       try {
         if (window.speechSynthesis.paused) {
           window.speechSynthesis.resume();
         }
-        window.speechSynthesis.cancel();
 
         const utterance = new SpeechSynthesisUtterance(cleanText);
         utterance.lang = 'en-US';
-        utterance.rate = slow ? 0.6 : 0.9;
+        utterance.rate = slow ? 0.65 : 0.88;
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
 
-        // Select the best quality English voice available on this device
+        // Select best quality English voice
         const voices = getVoices();
-        const englishVoice = voices.find(
-          (v) => (v.lang.startsWith('en') || v.lang === 'en-US') && 
-                 (v.name.includes('Natural') || v.name.includes('Siri') || v.name.includes('Samantha') || v.name.includes('Google') || v.name.includes('US') || v.name.includes('Daniel') || v.name.includes('Karen'))
-        ) || voices.find((v) => v.lang.startsWith('en'));
+        if (voices.length > 0) {
+          const englishVoice = voices.find(
+            (v) => (v.lang === 'en-US' || v.lang.startsWith('en')) && 
+                   (v.name.includes('Natural') || v.name.includes('Siri') || v.name.includes('Samantha') || v.name.includes('Google') || v.name.includes('US') || v.name.includes('Daniel') || v.name.includes('Karen'))
+          ) || voices.find((v) => v.lang.startsWith('en'));
 
-        if (englishVoice) {
-          utterance.voice = englishVoice;
+          if (englishVoice) {
+            utterance.voice = englishVoice;
+          }
         }
 
-        // Prevent iOS Safari garbage-collecting the utterance before completion
         activeUtterance = utterance;
         (window as unknown as { _currentUtterance?: SpeechSynthesisUtterance | null })._currentUtterance = utterance;
 
-        let finished = false;
-        const cleanup = () => {
-          if (!finished) {
-            finished = true;
-            activeUtterance = null;
-            if (typeof window !== 'undefined') {
-              (window as unknown as { _currentUtterance?: SpeechSynthesisUtterance | null })._currentUtterance = null;
-            }
-            resolve();
-          }
+        utterance.onend = finish;
+        utterance.onerror = () => {
+          playAudioFallback(cleanText, 'en', slow, finish);
         };
 
-        utterance.onend = cleanup;
-        utterance.onerror = cleanup;
+        // If iOS speech queue does not start within 1500ms, use audio element fallback
+        const safetyTimer = setTimeout(() => {
+          if (!finished) {
+            playAudioFallback(cleanText, 'en', slow, finish);
+          }
+        }, 2000);
 
-        // Fail-safe timeout in case speech engine stalls
-        setTimeout(cleanup, 5000);
+        utterance.onstart = () => {
+          clearTimeout(safetyTimer);
+        };
 
         window.speechSynthesis.speak(utterance);
+
+        // iOS Safari resume bug fix
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
         return;
       } catch {
-        // Fall through to audio element fallback if Web Speech throws
+        // Fall through to fallback
       }
     }
 
-    // Fallback: HTML5 Audio for browsers without speech synthesis
-    try {
-      const encoded = encodeURIComponent(cleanText);
-      const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=${encoded}`;
-      const audio = new Audio();
-      activeAudioElement = audio;
-      audio.playbackRate = slow ? 0.7 : 1.0;
-
-      let resolved = false;
-      const finishAudio = () => {
-        if (!resolved) {
-          resolved = true;
-          if (activeAudioElement === audio) activeAudioElement = null;
-          resolve();
-        }
-      };
-
-      const timer = setTimeout(finishAudio, 4000);
-      audio.onended = () => {
-        clearTimeout(timer);
-        finishAudio();
-      };
-      audio.onerror = () => {
-        clearTimeout(timer);
-        finishAudio();
-      };
-
-      audio.src = url;
-      const p = audio.play();
-      if (p !== undefined) {
-        p.catch(() => {
-          clearTimeout(timer);
-          finishAudio();
-        });
-      }
-    } catch {
-      resolve();
-    }
+    playAudioFallback(cleanText, 'en', slow, finish);
   });
 }
 
 // Speech Synthesis for Thai pronunciation with authentic Thai accent
-// Immediate synchronous invocation to preserve iOS Safari user-gesture privilege
 export function speakThai(text: string, slow: boolean = false): Promise<void> {
   return new Promise((resolve) => {
     soundManager.unlock();
@@ -395,13 +432,24 @@ export function speakThai(text: string, slow: boolean = false): Promise<void> {
       return;
     }
 
+    let finished = false;
+    const finish = () => {
+      if (!finished) {
+        finished = true;
+        activeUtterance = null;
+        if (typeof window !== 'undefined') {
+          (window as unknown as { _currentUtterance?: SpeechSynthesisUtterance | null })._currentUtterance = null;
+        }
+        resolve();
+      }
+    };
+
     // Native Web Speech API
     if ('speechSynthesis' in window) {
       try {
         if (window.speechSynthesis.paused) {
           window.speechSynthesis.resume();
         }
-        window.speechSynthesis.cancel();
 
         const utterance = new SpeechSynthesisUtterance(cleanText);
         utterance.lang = 'th-TH';
@@ -411,82 +459,47 @@ export function speakThai(text: string, slow: boolean = false): Promise<void> {
 
         // Select the best quality Thai voice available on device (iOS Siri Kanya, Narisa, Premwadee, etc.)
         const voices = getVoices();
-        const thaiVoice = voices.find(
-          (v) => (v.lang === 'th-TH' || v.lang.startsWith('th')) && 
-                 (v.name.includes('Premwadee') || v.name.includes('Kanya') || v.name.includes('Siri') || v.name.includes('Narisa') || v.name.includes('Achara') || v.name.includes('Google') || v.name.includes('Thai'))
-        ) || voices.find((v) => v.lang.startsWith('th') || v.lang.includes('th') || v.lang === 'th-TH');
+        if (voices.length > 0) {
+          const thaiVoice = voices.find(
+            (v) => (v.lang === 'th-TH' || v.lang.startsWith('th')) && 
+                   (v.name.includes('Premwadee') || v.name.includes('Kanya') || v.name.includes('Siri') || v.name.includes('Narisa') || v.name.includes('Achara') || v.name.includes('Google') || v.name.includes('Thai'))
+          ) || voices.find((v) => v.lang.startsWith('th') || v.lang.includes('th') || v.lang === 'th-TH');
 
-        if (thaiVoice) {
-          utterance.voice = thaiVoice;
+          if (thaiVoice) {
+            utterance.voice = thaiVoice;
+          }
         }
 
-        // Prevent iOS Safari garbage-collecting the utterance before completion
         activeUtterance = utterance;
         (window as unknown as { _currentUtterance?: SpeechSynthesisUtterance | null })._currentUtterance = utterance;
 
-        let finished = false;
-        const cleanup = () => {
-          if (!finished) {
-            finished = true;
-            activeUtterance = null;
-            if (typeof window !== 'undefined') {
-              (window as unknown as { _currentUtterance?: SpeechSynthesisUtterance | null })._currentUtterance = null;
-            }
-            resolve();
-          }
+        utterance.onend = finish;
+        utterance.onerror = () => {
+          playAudioFallback(cleanText, 'th', slow, finish);
         };
 
-        utterance.onend = cleanup;
-        utterance.onerror = cleanup;
+        const safetyTimer = setTimeout(() => {
+          if (!finished) {
+            playAudioFallback(cleanText, 'th', slow, finish);
+          }
+        }, 2000);
 
-        // Fail-safe timeout
-        setTimeout(cleanup, 5000);
+        utterance.onstart = () => {
+          clearTimeout(safetyTimer);
+        };
 
         window.speechSynthesis.speak(utterance);
+
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
         return;
       } catch {
         // Fall through
       }
     }
 
-    // Fallback: HTML5 Audio for browsers without speech synthesis
-    try {
-      const encoded = encodeURIComponent(cleanText);
-      const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=th&client=tw-ob&q=${encoded}`;
-      const audio = new Audio();
-      activeAudioElement = audio;
-      audio.playbackRate = slow ? 0.8 : 1.0;
-
-      let resolved = false;
-      const finishAudio = () => {
-        if (!resolved) {
-          resolved = true;
-          if (activeAudioElement === audio) activeAudioElement = null;
-          resolve();
-        }
-      };
-
-      const timer = setTimeout(finishAudio, 4000);
-      audio.onended = () => {
-        clearTimeout(timer);
-        finishAudio();
-      };
-      audio.onerror = () => {
-        clearTimeout(timer);
-        finishAudio();
-      };
-
-      audio.src = url;
-      const p = audio.play();
-      if (p !== undefined) {
-        p.catch(() => {
-          clearTimeout(timer);
-          finishAudio();
-        });
-      }
-    } catch {
-      resolve();
-    }
+    playAudioFallback(cleanText, 'th', slow, finish);
   });
 }
 

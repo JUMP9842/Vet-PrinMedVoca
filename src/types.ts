@@ -74,6 +74,8 @@ export interface PracticeHistoryRecord {
   wordsReviewed: HistoryWordItem[];
 }
 
+export type MasteryStatus = 'mastered' | 'learning' | 'forgotten'; // 'จำได้แล้ว' | 'พอจำได้' | 'จำไม่ได้'
+
 export interface UserProfile {
   id: string;
   username: string;
@@ -85,6 +87,7 @@ export interface UserProfile {
   dailyGoalXp: number;
   stats: UserStats;
   bookmarkedIds: string[];
+  masteryStatus?: Record<string, MasteryStatus>; // Map of wordId -> 'mastered' | 'learning' | 'forgotten'
   history: PracticeHistoryRecord[];
   avatarColor: string;
 }

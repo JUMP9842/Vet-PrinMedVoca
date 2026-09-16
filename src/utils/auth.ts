@@ -10,10 +10,11 @@ import {
   Unsubscribe 
 } from 'firebase/firestore';
 import { db } from '../firebase';
-import { UserProfile, UserStats, PracticeHistoryRecord } from '../types';
+import { UserProfile, UserStats, PracticeHistoryRecord, MasteryStatus } from '../types';
 
 const STORAGE_ACTIVE_USER_ID_KEY = 'medvoca_active_user_id_v5';
 const STORAGE_CACHED_USER_KEY = 'medvoca_cached_user_v5';
+const STORAGE_GUEST_MASTERY_KEY = 'medvoca_guest_mastery_v1';
 
 const DEFAULT_AVATAR_COLORS = [
   '#486581', '#627D98', '#334E68', '#5B7B9A', '#3B5B78', '#4A6B8A', '#0D5F7A', '#317873'
@@ -48,8 +49,32 @@ export function createNewUserProfileWithUsername(username: string, password?: st
       totalQuestionsAnswered: 0,
     },
     bookmarkedIds: ['hyperthermia', 'dyspnea', 'closed_fracture'],
+    masteryStatus: {},
     history: [],
   };
+}
+
+/**
+ * Guest mastery status persistence (for users without an account)
+ */
+export function getGuestMastery(): Record<string, MasteryStatus> {
+  try {
+    const raw = localStorage.getItem(STORAGE_GUEST_MASTERY_KEY);
+    if (raw) {
+      return JSON.parse(raw);
+    }
+  } catch (err) {
+    console.warn('Failed to parse guest mastery:', err);
+  }
+  return {};
+}
+
+export function saveGuestMastery(mastery: Record<string, MasteryStatus>): void {
+  try {
+    localStorage.setItem(STORAGE_GUEST_MASTERY_KEY, JSON.stringify(mastery));
+  } catch (err) {
+    console.error('Failed to save guest mastery:', err);
+  }
 }
 
 /**
@@ -350,6 +375,31 @@ export async function toggleBookmarkAndSync(
   const updatedUser: UserProfile = {
     ...currentUser,
     bookmarkedIds: newBookmarks,
+    lastActive: Date.now(),
+  };
+
+  await syncUserToFirestore(updatedUser);
+  return updatedUser;
+}
+
+/**
+ * Update word mastery recall status ('mastered' | 'learning' | 'forgotten' | null) and sync to Firestore
+ */
+export async function updateWordMasteryAndSync(
+  currentUser: UserProfile,
+  wordId: string,
+  status: MasteryStatus | null
+): Promise<UserProfile> {
+  const currentMap = { ...(currentUser.masteryStatus || {}) };
+  if (status === null) {
+    delete currentMap[wordId];
+  } else {
+    currentMap[wordId] = status;
+  }
+
+  const updatedUser: UserProfile = {
+    ...currentUser,
+    masteryStatus: currentMap,
     lastActive: Date.now(),
   };
 

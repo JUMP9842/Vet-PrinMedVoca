@@ -222,11 +222,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Mobile Learning Mode Bubbles (All modes visible directly without scrolling) */}
-        <div className="md:hidden py-2 border-t border-[#E8EFF6]">
-          {/* Row 1: 4 Mode Bubbles */}
-          <div className="grid grid-cols-4 gap-1.5">
-            {navTabs.slice(0, 4).map((tab) => {
+        {/* Mobile Learning Mode Bubbles (All 7 modes visible with zero horizontal scroll) */}
+        <div className="md:hidden py-2 px-1 border-t border-[#E8EFF6]">
+          <div className="flex flex-wrap items-center justify-center gap-1.5">
+            {navTabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = currentTab === tab.id;
               return (
@@ -235,46 +234,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                   id={`mobile-bubble-tab-${tab.id}`}
                   type="button"
                   onClick={() => handleSelectTab(tab.id)}
-                  className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all select-none text-center min-h-[48px] ${
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-bold transition-all select-none shadow-2xs active:scale-95 ${
                     isActive
-                      ? 'bg-[#334E68] text-white shadow-xs font-bold ring-1 ring-[#243B53]'
-                      : 'bg-[#F0F5FA] text-[#334E68] hover:bg-[#E4ECF4] active:bg-[#D2E0EC] border border-[#D2E0EC] font-semibold'
+                      ? 'bg-[#243B53] text-white shadow-xs ring-2 ring-[#486581]/30 scale-[1.03]'
+                      : 'bg-[#F0F5FA] text-[#334E68] hover:bg-[#E4ECF4] border border-[#D2E0EC]'
                   }`}
                   aria-label={tab.label}
                   aria-pressed={isActive}
                 >
-                  <Icon className={`w-3.5 h-3.5 mb-1 ${isActive ? 'text-white' : 'text-[#486581]'}`} />
-                  <span className="text-[10px] leading-tight truncate max-w-full font-medium">
-                    {tab.shortLabel}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Row 2: 3 Mode Bubbles */}
-          <div className="grid grid-cols-3 gap-1.5 mt-1.5">
-            {navTabs.slice(4).map((tab) => {
-              const Icon = tab.icon;
-              const isActive = currentTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  id={`mobile-bubble-tab-${tab.id}`}
-                  type="button"
-                  onClick={() => handleSelectTab(tab.id)}
-                  className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all select-none text-center min-h-[48px] ${
-                    isActive
-                      ? 'bg-[#334E68] text-white shadow-xs font-bold ring-1 ring-[#243B53]'
-                      : 'bg-[#F0F5FA] text-[#334E68] hover:bg-[#E4ECF4] active:bg-[#D2E0EC] border border-[#D2E0EC] font-semibold'
-                  }`}
-                  aria-label={tab.label}
-                  aria-pressed={isActive}
-                >
-                  <Icon className={`w-3.5 h-3.5 mb-1 ${isActive ? 'text-white' : 'text-[#486581]'}`} />
-                  <span className="text-[10px] leading-tight truncate max-w-full font-medium">
-                    {tab.shortLabel}
-                  </span>
+                  <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-[#38BEC9]' : 'text-[#486581]'}`} />
+                  <span className="whitespace-nowrap">{tab.shortLabel}</span>
                 </button>
               );
             })}

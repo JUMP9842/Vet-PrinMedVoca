@@ -10,18 +10,31 @@ import {
   Volume1,
   ChevronDown,
   Check,
-  Filter
+  Filter,
+  CheckCircle2,
+  HelpCircle,
+  XCircle,
+  Sparkles,
+  CreditCard,
+  Keyboard,
+  ListFilter,
+  Play
 } from 'lucide-react';
-import { VocabItem } from '../types';
+import { VocabItem, MasteryStatus } from '../types';
 import { SYSTEM_CATEGORIES } from '../data';
 import { speakWord, speakThai, soundManager } from '../utils/audio';
 
 interface DictionaryViewProps {
   vocabList: VocabItem[];
   bookmarkedIds: string[];
+  masteryStatus: Record<string, MasteryStatus>;
   onToggleBookmark: (id: string) => void;
+  onUpdateMastery: (wordId: string, status: MasteryStatus | null) => void;
   onSelectWordDetail: (word: VocabItem) => void;
   onStartQuizWithWords?: (words: VocabItem[]) => void;
+  onStartFlashcardWithWords?: (words: VocabItem[]) => void;
+  onStartTypingWithWords?: (words: VocabItem[]) => void;
+  onStartAudioPracticeWithWords?: (words: VocabItem[]) => void;
 }
 
 const ALPHABET = [
@@ -32,13 +45,19 @@ const ALPHABET = [
 export const DictionaryView: React.FC<DictionaryViewProps> = ({
   vocabList,
   bookmarkedIds,
+  masteryStatus,
   onToggleBookmark,
+  onUpdateMastery,
   onSelectWordDetail,
   onStartQuizWithWords,
+  onStartFlashcardWithWords,
+  onStartTypingWithWords,
+  onStartAudioPracticeWithWords,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLetter, setSelectedLetter] = useState('ALL');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedMasteryFilter, setSelectedMasteryFilter] = useState<'all' | MasteryStatus | 'unrated'>('all');
   const [showOnlyBookmarked, setShowOnlyBookmarked] = useState(false);
   const [activeSpeechId, setActiveSpeechId] = useState<string | null>(null);
   const [mobileCategoryOpen, setMobileCategoryOpen] = useState(false);
@@ -56,21 +75,49 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
     };
   }, [mobileCategoryOpen, mobileLetterOpen]);
 
+  // Mastery Category Counts
+  const masteryCounts = useMemo(() => {
+    let mastered = 0;
+    let learning = 0;
+    let forgotten = 0;
+    let unrated = 0;
+    vocabList.forEach((item) => {
+      const status = masteryStatus[item.id];
+      if (status === 'mastered') mastered++;
+      else if (status === 'learning') learning++;
+      else if (status === 'forgotten') forgotten++;
+      else unrated++;
+    });
+    return { all: vocabList.length, mastered, learning, forgotten, unrated };
+  }, [vocabList, masteryStatus]);
+
   // Filtered and Sorted Vocab
   const filteredVocab = useMemo(() => {
     return vocabList.filter((item) => {
       if (showOnlyBookmarked && !bookmarkedIds.includes(item.id)) {
         return false;
       }
+      // Mastery Status Category Filter
+      if (selectedMasteryFilter !== 'all') {
+        const status = masteryStatus[item.id];
+        if (selectedMasteryFilter === 'unrated') {
+          if (status) return false;
+        } else {
+          if (status !== selectedMasteryFilter) return false;
+        }
+      }
+      // A-Z Letter Filter
       if (selectedLetter !== 'ALL') {
         const firstLetter = item.word.trim().charAt(0).toUpperCase();
         if (firstLetter !== selectedLetter) return false;
       }
+      // Medical Category & Related Group Filter
       if (selectedCategory !== 'all') {
         if (!item.category.includes(selectedCategory) && !item.relatedGroup.includes(selectedCategory)) {
           return false;
         }
       }
+      // Search Query
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase().trim();
         const matchesWord = item.word.toLowerCase().includes(query);
@@ -85,7 +132,7 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
       }
       return true;
     }).sort((a, b) => a.word.localeCompare(b.word));
-  }, [vocabList, searchQuery, selectedLetter, selectedCategory, showOnlyBookmarked, bookmarkedIds]);
+  }, [vocabList, searchQuery, selectedLetter, selectedCategory, selectedMasteryFilter, showOnlyBookmarked, bookmarkedIds, masteryStatus]);
 
   const handlePronounce = async (e: React.MouseEvent, text: string, id: string, slow: boolean = false) => {
     e.stopPropagation();
@@ -104,13 +151,28 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
   };
 
   const letterCounts = useMemo(() => {
-    const map: Record<string, number> = { ALL: vocabList.length };
+    const map: Record<string, number> = { ALL: 0 };
     vocabList.forEach((item) => {
+      if (showOnlyBookmarked && !bookmarkedIds.includes(item.id)) return;
+      if (selectedMasteryFilter !== 'all') {
+        const status = masteryStatus[item.id];
+        if (selectedMasteryFilter === 'unrated') {
+          if (status) return;
+        } else {
+          if (status !== selectedMasteryFilter) return;
+        }
+      }
+      if (selectedCategory !== 'all') {
+        if (!item.category.includes(selectedCategory) && !item.relatedGroup.includes(selectedCategory)) {
+          return;
+        }
+      }
+      map.ALL = (map.ALL || 0) + 1;
       const char = item.word.trim().charAt(0).toUpperCase();
       map[char] = (map[char] || 0) + 1;
     });
     return map;
-  }, [vocabList]);
+  }, [vocabList, selectedCategory, selectedMasteryFilter, showOnlyBookmarked, bookmarkedIds, masteryStatus]);
 
   return (
     <div className="space-y-6 pb-24 animate-fade-in text-base">
@@ -160,7 +222,7 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
               <span>คำที่บันทึกไว้ ({bookmarkedIds.length})</span>
             </button>
 
-            {(searchQuery || selectedLetter !== 'ALL' || selectedCategory !== 'all' || showOnlyBookmarked) && (
+            {(searchQuery || selectedLetter !== 'ALL' || selectedCategory !== 'all' || showOnlyBookmarked || selectedMasteryFilter !== 'all') && (
               <button
                 id="btn-reset-filters"
                 onClick={() => {
@@ -168,6 +230,7 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                   setSearchQuery('');
                   setSelectedLetter('ALL');
                   setSelectedCategory('all');
+                  setSelectedMasteryFilter('all');
                   setShowOnlyBookmarked(false);
                 }}
                 className="p-2.5 rounded-xl bg-[#F0F5FA] hover:bg-[#E4ECF4] text-[#486581] border border-[#D2E0EC] transition-colors"
@@ -176,6 +239,146 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                 <RotateCcw className="w-4 h-4" />
               </button>
             )}
+          </div>
+        </div>
+
+        {/* Mastery Recall Category Bar (จำได้แล้ว / พอจำได้ / จำไม่ได้ / ยังไม่ประเมิน) */}
+        <div className="pt-2 border-t border-[#E8EFF6] space-y-2">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <span className="text-xs font-bold text-[#334E68] flex items-center gap-1.5">
+              <ListFilter className="w-3.5 h-3.5 text-[#486581]" />
+              <span>หมวดหมู่ตามระดับความจำ (Mastery Categories):</span>
+            </span>
+            {selectedMasteryFilter !== 'all' && (
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-[#F0F5FA] text-[#006270] border border-[#D2E0EC]">
+                กำลังกรอง: {
+                  selectedMasteryFilter === 'mastered' ? '✓ จำได้แล้ว' :
+                  selectedMasteryFilter === 'learning' ? '~ พอจำได้' :
+                  selectedMasteryFilter === 'forgotten' ? '✕ จำไม่ได้ (ต้องทบทวนด่วน)' : 'ยังไม่ได้ประเมิน'
+                }
+              </span>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 sm:gap-2">
+            {/* All */}
+            <button
+              id="filter-mastery-all"
+              type="button"
+              onClick={() => {
+                soundManager.playClick();
+                setSelectedMasteryFilter('all');
+              }}
+              className={`flex items-center justify-between p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-bold border transition-all ${
+                selectedMasteryFilter === 'all'
+                  ? 'bg-[#334E68] text-white border-[#334E68] shadow-xs'
+                  : 'bg-[#F0F5FA] hover:bg-[#E4ECF4] text-[#334E68] border-[#D2E0EC]'
+              }`}
+            >
+              <span>ทั้งหมด</span>
+              <span className={`px-1.5 py-0.5 rounded-md text-[11px] font-bold ${
+                selectedMasteryFilter === 'all' ? 'bg-white/20 text-white' : 'bg-[#D2E0EC] text-[#334E68]'
+              }`}>
+                {masteryCounts.all}
+              </span>
+            </button>
+
+            {/* Mastered */}
+            <button
+              id="filter-mastery-mastered"
+              type="button"
+              onClick={() => {
+                soundManager.playClick();
+                setSelectedMasteryFilter('mastered');
+              }}
+              className={`flex items-center justify-between p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-bold border transition-all ${
+                selectedMasteryFilter === 'mastered'
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                  : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
+              }`}
+            >
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
+                <span>จำได้แล้ว</span>
+              </div>
+              <span className={`px-1.5 py-0.5 rounded-md text-[11px] font-bold ${
+                selectedMasteryFilter === 'mastered' ? 'bg-white/20 text-white' : 'bg-emerald-200 text-emerald-900'
+              }`}>
+                {masteryCounts.mastered}
+              </span>
+            </button>
+
+            {/* Learning */}
+            <button
+              id="filter-mastery-learning"
+              type="button"
+              onClick={() => {
+                soundManager.playClick();
+                setSelectedMasteryFilter('learning');
+              }}
+              className={`flex items-center justify-between p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-bold border transition-all ${
+                selectedMasteryFilter === 'learning'
+                  ? 'bg-amber-500 text-white border-amber-500 shadow-xs'
+                  : 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-200'
+              }`}
+            >
+              <div className="flex items-center gap-1.5">
+                <HelpCircle className="w-3.5 h-3.5 shrink-0 text-amber-500" />
+                <span>พอจำได้</span>
+              </div>
+              <span className={`px-1.5 py-0.5 rounded-md text-[11px] font-bold ${
+                selectedMasteryFilter === 'learning' ? 'bg-white/20 text-white' : 'bg-amber-200 text-amber-900'
+              }`}>
+                {masteryCounts.learning}
+              </span>
+            </button>
+
+            {/* Forgotten */}
+            <button
+              id="filter-mastery-forgotten"
+              type="button"
+              onClick={() => {
+                soundManager.playClick();
+                setSelectedMasteryFilter('forgotten');
+              }}
+              className={`flex items-center justify-between p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-bold border transition-all ${
+                selectedMasteryFilter === 'forgotten'
+                  ? 'bg-rose-600 text-white border-rose-600 shadow-xs'
+                  : 'bg-rose-50 hover:bg-rose-100 text-rose-800 border-rose-200'
+              }`}
+            >
+              <div className="flex items-center gap-1.5">
+                <XCircle className="w-3.5 h-3.5 shrink-0 text-rose-500" />
+                <span>จำไม่ได้</span>
+              </div>
+              <span className={`px-1.5 py-0.5 rounded-md text-[11px] font-bold ${
+                selectedMasteryFilter === 'forgotten' ? 'bg-white/20 text-white' : 'bg-rose-200 text-rose-900'
+              }`}>
+                {masteryCounts.forgotten}
+              </span>
+            </button>
+
+            {/* Unrated */}
+            <button
+              id="filter-mastery-unrated"
+              type="button"
+              onClick={() => {
+                soundManager.playClick();
+                setSelectedMasteryFilter('unrated');
+              }}
+              className={`col-span-2 sm:col-span-1 flex items-center justify-between p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-bold border transition-all ${
+                selectedMasteryFilter === 'unrated'
+                  ? 'bg-[#486581] text-white border-[#486581] shadow-xs'
+                  : 'bg-[#F0F5FA] hover:bg-[#E4ECF4] text-[#486581] border-[#D2E0EC]'
+              }`}
+            >
+              <span>ยังไม่ประเมิน</span>
+              <span className={`px-1.5 py-0.5 rounded-md text-[11px] font-bold ${
+                selectedMasteryFilter === 'unrated' ? 'bg-white/20 text-white' : 'bg-[#D2E0EC] text-[#486581]'
+              }`}>
+                {masteryCounts.unrated}
+              </span>
+            </button>
           </div>
         </div>
 
@@ -391,6 +594,90 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
         </div>
       </div>
 
+      {/* Targeted Review Bar ("ทบทวนเฉพาะคำนั้นๆ ที่เลือกมาเป็นหมวดหมู่") */}
+      {filteredVocab.length > 0 && (
+        <div className="bg-[#102A43] rounded-2xl p-4 sm:p-5 text-white shadow-sm border border-[#243B53] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="px-2 py-0.5 rounded-md text-[11px] font-bold bg-[#006270] text-[#E0FCFF]">
+                โฟกัสทบทวนเฉพาะกลุ่ม
+              </span>
+              <h3 className="font-bold text-sm sm:text-base text-white">
+                พร้อมทบทวนคำศัพท์ชุดนี้ ({filteredVocab.length} คำ)
+              </h3>
+            </div>
+            <p className="text-xs text-[#9FB3C8]">
+              {selectedMasteryFilter !== 'all' ? `หมวดความจำ: ${selectedMasteryFilter === 'mastered' ? 'จำได้แล้ว' : selectedMasteryFilter === 'learning' ? 'พอจำได้' : selectedMasteryFilter === 'forgotten' ? 'จำไม่ได้ (ต้องทบทวนด่วน)' : 'ยังไม่ประเมิน'}` : 'ทุกระดับความจำ'}
+              {selectedCategory !== 'all' ? ` • ${selectedCategory}` : ''}
+              {selectedLetter !== 'ALL' ? ` • อักษร ${selectedLetter}` : ' • อักษร A-Z'}
+              {showOnlyBookmarked ? ' • เฉพาะที่บันทึก' : ''}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap w-full md:w-auto">
+            {onStartFlashcardWithWords && (
+              <button
+                id="btn-targeted-flashcard"
+                onClick={() => {
+                  soundManager.playClick();
+                  onStartFlashcardWithWords(filteredVocab);
+                }}
+                className="flex-1 sm:flex-initial px-3.5 py-2 rounded-xl bg-white text-[#102A43] hover:bg-[#F0F5FA] font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition-all hover:scale-[1.02]"
+                title="ทบทวนคำศัพท์กลุ่มนี้ด้วยแฟลชการ์ด"
+              >
+                <CreditCard className="w-4 h-4 text-[#006270]" />
+                <span>แฟลชการ์ด</span>
+              </button>
+            )}
+
+            {onStartQuizWithWords && (
+              <button
+                id="btn-targeted-quiz"
+                onClick={() => {
+                  soundManager.playClick();
+                  onStartQuizWithWords(filteredVocab);
+                }}
+                className="flex-1 sm:flex-initial px-3.5 py-2 rounded-xl bg-[#006270] hover:bg-[#004f5a] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition-all hover:scale-[1.02]"
+                title="ทำแบบทดสอบ 4 ตัวเลือกเฉพาะคำกลุ่มนี้"
+              >
+                <HelpCircle className="w-4 h-4" />
+                <span>ช้อยส์ ({Math.min(10, filteredVocab.length)})</span>
+              </button>
+            )}
+
+            {onStartTypingWithWords && (
+              <button
+                id="btn-targeted-typing"
+                onClick={() => {
+                  soundManager.playClick();
+                  onStartTypingWithWords(filteredVocab);
+                }}
+                className="flex-1 sm:flex-initial px-3 py-2 rounded-xl bg-[#243B53] hover:bg-[#334E68] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 border border-[#486581] transition-all hover:scale-[1.02]"
+                title="ฝึกพิมพ์ตอบคำศัพท์เฉพาะกลุ่มนี้"
+              >
+                <Keyboard className="w-4 h-4 text-[#9FB3C8]" />
+                <span>พิมพ์ตอบ</span>
+              </button>
+            )}
+
+            {onStartAudioPracticeWithWords && (
+              <button
+                id="btn-targeted-audio"
+                onClick={() => {
+                  soundManager.playClick();
+                  onStartAudioPracticeWithWords(filteredVocab);
+                }}
+                className="flex-1 sm:flex-initial px-3 py-2 rounded-xl bg-[#243B53] hover:bg-[#334E68] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 border border-[#486581] transition-all hover:scale-[1.02]"
+                title="ฝึกฟังเสียงคำศัพท์เฉพาะกลุ่มนี้"
+              >
+                <Volume2 className="w-4 h-4 text-[#9FB3C8]" />
+                <span>ฟังเสียง</span>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Vocabulary Card / Table Container */}
       <div className="bg-[#FFFFFF] rounded-2xl border border-[#D2E0EC] shadow-xs overflow-hidden">
         {filteredVocab.length === 0 ? (
@@ -532,6 +819,74 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                         </span>
                       )}
                     </div>
+
+                    {/* Mastery Recall Status Quick Ticking */}
+                    <div 
+                      className="pt-2.5 border-t border-[#E8EFF6] flex items-center justify-between gap-1 flex-wrap" 
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <span className="text-xs font-bold text-[#627D98]">ระดับความจำ:</span>
+                      <div className="flex items-center gap-1">
+                        <button
+                          id={`btn-mobile-mastery-mastered-${item.id}`}
+                          type="button"
+                          onClick={() => {
+                            const current = masteryStatus[item.id];
+                            const next = current === 'mastered' ? null : 'mastered';
+                            if (next) soundManager.playCorrect();
+                            else soundManager.playClick();
+                            onUpdateMastery(item.id, next);
+                          }}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
+                            masteryStatus[item.id] === 'mastered'
+                              ? 'bg-emerald-600 text-white shadow-xs'
+                              : 'bg-[#F0F5FA] text-[#047857] hover:bg-emerald-50 border border-[#D2E0EC]'
+                          }`}
+                          title="ติ๊ก: จำได้แล้ว"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>จำได้แล้ว</span>
+                        </button>
+                        <button
+                          id={`btn-mobile-mastery-learning-${item.id}`}
+                          type="button"
+                          onClick={() => {
+                            const current = masteryStatus[item.id];
+                            const next = current === 'learning' ? null : 'learning';
+                            soundManager.playClick();
+                            onUpdateMastery(item.id, next);
+                          }}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
+                            masteryStatus[item.id] === 'learning'
+                              ? 'bg-amber-500 text-white shadow-xs'
+                              : 'bg-[#F0F5FA] text-[#B45309] hover:bg-amber-50 border border-[#D2E0EC]'
+                          }`}
+                          title="ติ๊ก: พอจำได้"
+                        >
+                          <HelpCircle className="w-3.5 h-3.5" />
+                          <span>พอจำได้</span>
+                        </button>
+                        <button
+                          id={`btn-mobile-mastery-forgotten-${item.id}`}
+                          type="button"
+                          onClick={() => {
+                            const current = masteryStatus[item.id];
+                            const next = current === 'forgotten' ? null : 'forgotten';
+                            soundManager.playClick();
+                            onUpdateMastery(item.id, next);
+                          }}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
+                            masteryStatus[item.id] === 'forgotten'
+                              ? 'bg-rose-600 text-white shadow-xs'
+                              : 'bg-[#F0F5FA] text-[#B91C1C] hover:bg-rose-50 border border-[#D2E0EC]'
+                          }`}
+                          title="ติ๊ก: จำไม่ได้"
+                        >
+                          <XCircle className="w-3.5 h-3.5" />
+                          <span>จำไม่ได้</span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 );
               })}
@@ -548,6 +903,7 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                     <th className="py-3.5 px-4 min-w-[280px]">ความหมายทางการแพทย์</th>
                     <th className="py-3.5 px-4 min-w-[170px] hidden md:table-cell">ระบบอวัยวะ</th>
                     <th className="py-3.5 px-4 min-w-[200px] hidden lg:table-cell">กลุ่มที่เชื่อมโยง & รากศัพท์</th>
+                    <th className="py-3.5 px-4 min-w-[220px] text-center">ระดับความจำ</th>
                     <th className="py-3.5 px-4 w-16 text-center">บันทึก</th>
                   </tr>
                 </thead>
@@ -663,6 +1019,70 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                             {item.rootMeaning && (
                               <p className="text-xs text-[#829AB1] line-clamp-1">{item.rootMeaning}</p>
                             )}
+                          </div>
+                        </td>
+
+                        {/* Mastery Recall Status */}
+                        <td className="py-4 px-3 text-center" onClick={(e) => e.stopPropagation()}>
+                          <div className="inline-flex items-center p-1 rounded-xl bg-[#F0F5FA] border border-[#D2E0EC] gap-1 shadow-2xs">
+                            <button
+                              id={`btn-table-mastery-mastered-${item.id}`}
+                              type="button"
+                              onClick={() => {
+                                const current = masteryStatus[item.id];
+                                const next = current === 'mastered' ? null : 'mastered';
+                                if (next) soundManager.playCorrect();
+                                else soundManager.playClick();
+                                onUpdateMastery(item.id, next);
+                              }}
+                              className={`px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
+                                masteryStatus[item.id] === 'mastered'
+                                  ? 'bg-emerald-600 text-white shadow-xs'
+                                  : 'text-[#047857] hover:bg-white hover:text-emerald-800'
+                              }`}
+                              title="ติ๊ก: จำได้แล้ว"
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              <span>จำได้แล้ว</span>
+                            </button>
+                            <button
+                              id={`btn-table-mastery-learning-${item.id}`}
+                              type="button"
+                              onClick={() => {
+                                const current = masteryStatus[item.id];
+                                const next = current === 'learning' ? null : 'learning';
+                                soundManager.playClick();
+                                onUpdateMastery(item.id, next);
+                              }}
+                              className={`px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
+                                masteryStatus[item.id] === 'learning'
+                                  ? 'bg-amber-500 text-white shadow-xs'
+                                  : 'text-[#B45309] hover:bg-white hover:text-amber-800'
+                              }`}
+                              title="ติ๊ก: พอจำได้"
+                            >
+                              <HelpCircle className="w-3.5 h-3.5" />
+                              <span>พอจำได้</span>
+                            </button>
+                            <button
+                              id={`btn-table-mastery-forgotten-${item.id}`}
+                              type="button"
+                              onClick={() => {
+                                const current = masteryStatus[item.id];
+                                const next = current === 'forgotten' ? null : 'forgotten';
+                                soundManager.playClick();
+                                onUpdateMastery(item.id, next);
+                              }}
+                              className={`px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
+                                masteryStatus[item.id] === 'forgotten'
+                                  ? 'bg-rose-600 text-white shadow-xs'
+                                  : 'text-[#B91C1C] hover:bg-white hover:text-rose-800'
+                              }`}
+                              title="ติ๊ก: จำไม่ได้"
+                            >
+                              <XCircle className="w-3.5 h-3.5" />
+                              <span>จำไม่ได้</span>
+                            </button>
                           </div>
                         </td>
 

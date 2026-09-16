@@ -27,6 +27,10 @@
           "type": "array",
           "items": { "type": "string" }
         },
+        "masteryStatus": {
+          "type": "object",
+          "description": "Mastery recall status for each word: mastered, learning, forgotten"
+        },
         "history": {
           "type": "array",
           "items": {

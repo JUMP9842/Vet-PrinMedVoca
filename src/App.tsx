@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ALL_VOCAB } from './data';
-import { VocabItem, MainTab, UserProfile, HistoryWordItem } from './types';
+import { VocabItem, MainTab, UserProfile, HistoryWordItem, MasteryStatus } from './types';
 import { Navbar } from './components/Navbar';
 import { DictionaryView } from './components/DictionaryView';
 import { RelatedGroupsView } from './components/RelatedGroupsView';
@@ -18,7 +18,10 @@ import {
   subscribeToUserProfile,
   subscribeToTotalUsersCount,
   addHistoryRecordAndSync,
-  toggleBookmarkAndSync
+  toggleBookmarkAndSync,
+  getGuestMastery,
+  saveGuestMastery,
+  updateWordMasteryAndSync
 } from './utils/auth';
 import { soundManager } from './utils/audio';
 
@@ -40,6 +43,7 @@ export function App() {
   // Active User Profile - null if no previous login on this machine/device
   const [activeUser, setActiveUser] = useState<UserProfile | null>(() => getCachedActiveUser());
   const [guestBookmarks, setGuestBookmarks] = useState<string[]>(['hyperthermia', 'dyspnea']);
+  const [guestMastery, setGuestMastery] = useState<Record<string, MasteryStatus>>(() => getGuestMastery());
 
   // Auth Modal State
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -99,6 +103,24 @@ export function App() {
       setGuestBookmarks((prev) => 
         prev.includes(id) ? prev.filter((bId) => bId !== id) : [...prev, id]
       );
+    }
+  };
+
+  const handleUpdateMastery = async (wordId: string, status: MasteryStatus | null) => {
+    if (activeUser) {
+      const updated = await updateWordMasteryAndSync(activeUser, wordId, status);
+      setActiveUser(updated);
+    } else {
+      setGuestMastery((prev) => {
+        const next = { ...prev };
+        if (status) {
+          next[wordId] = status;
+        } else {
+          delete next[wordId];
+        }
+        saveGuestMastery(next);
+        return next;
+      });
     }
   };
 
@@ -221,6 +243,7 @@ export function App() {
   };
 
   const currentBookmarks = activeUser ? activeUser.bookmarkedIds : guestBookmarks;
+  const currentMastery = activeUser?.masteryStatus ?? guestMastery;
 
   return (
     <div className="min-h-screen bg-[#EDF3F8] text-[#1E2D3D] flex flex-col antialiased font-sans">
@@ -248,9 +271,14 @@ export function App() {
           <DictionaryView
             vocabList={ALL_VOCAB}
             bookmarkedIds={currentBookmarks}
+            masteryStatus={currentMastery}
             onToggleBookmark={handleToggleBookmark}
+            onUpdateMastery={handleUpdateMastery}
             onSelectWordDetail={setSelectedWordDetail}
             onStartQuizWithWords={handleStartQuizWithWords}
+            onStartFlashcardWithWords={handleStartFlashcardWithWords}
+            onStartTypingWithWords={handleStartTypingWithWords}
+            onStartAudioPracticeWithWords={handleStartAudioPracticeWithWords}
           />
         )}
 
@@ -265,7 +293,9 @@ export function App() {
           <FlashcardView
             allVocab={ALL_VOCAB}
             bookmarkedIds={currentBookmarks}
+            masteryStatus={currentMastery}
             onToggleBookmark={handleToggleBookmark}
+            onUpdateMastery={handleUpdateMastery}
             onSelectWordDetail={setSelectedWordDetail}
             onFinishDeck={handleFinishFlashcard}
             customWordSet={flashcardWordSet}
