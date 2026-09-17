@@ -58,8 +58,8 @@ export const RelatedGroupsView: React.FC<RelatedGroupsViewProps> = ({
   bookmarkedIds = [],
   onToggleBookmark,
 }) => {
-  const organCategories = useMemo(() => SYSTEM_CATEGORIES.filter(c => c.isOrgan), []);
-  const [selectedOrganId, setSelectedOrganId] = useState<string>(organCategories[0]?.id || 'ระบบหัวใจและหลอดเลือด');
+  const groupCategories = useMemo(() => SYSTEM_CATEGORIES.filter(c => c.id !== 'all'), []);
+  const [selectedOrganId, setSelectedOrganId] = useState<string>(groupCategories[0]?.id || 'ระบบหัวใจและหลอดเลือด');
   const [selectedClusterId, setSelectedClusterId] = useState<string>(RELATED_CLUSTERS[0].id);
   const [activeTab, setActiveTab] = useState<'organs' | 'clusters' | 'affixes'>('organs');
   const [selectedMasteryFilter, setSelectedMasteryFilter] = useState<'all' | MasteryStatus | 'unrated'>('all');
@@ -85,7 +85,7 @@ export const RelatedGroupsView: React.FC<RelatedGroupsViewProps> = ({
       .filter((item): item is VocabItem => Boolean(item));
   }, [selectedCluster]);
 
-  const selectedOrgan = organCategories.find(c => c.id === selectedOrganId) || organCategories[0];
+  const selectedOrgan = groupCategories.find(c => c.id === selectedOrganId) || groupCategories[0];
   const organWords = useMemo(() => {
     return ALL_VOCAB.filter(w => w.category.includes(selectedOrgan.id) || w.relatedGroup.includes(selectedOrgan.id))
       .sort((a, b) => a.word.localeCompare(b.word));
@@ -319,7 +319,7 @@ export const RelatedGroupsView: React.FC<RelatedGroupsViewProps> = ({
             หมวดหมู่ระบบอวัยวะ, กลุ่มโรค & รากศัพท์
           </h1>
           <p className="text-sm text-[#627D98] max-w-2xl">
-            เรียนรู้คำศัพท์แยกตามระบบอวัยวะทั้ง 11 ระบบ กลุ่มรอยโรค อาการตรงข้าม และรากศัพท์การแพทย์ ช่วยให้จำแม่นยำและเชื่อมโยงได้รวดเร็ว
+            เรียนรู้คำศัพท์แยกตามระบบอวัยวะ หมวดหมู่ทั่วไป กลุ่มรอยโรค อาการตรงข้าม และรากศัพท์การแพทย์ ช่วยให้จำแม่นยำและเชื่อมโยงได้รวดเร็ว
           </p>
         </div>
 
@@ -338,7 +338,7 @@ export const RelatedGroupsView: React.FC<RelatedGroupsViewProps> = ({
             }`}
           >
             <Heart className="w-4 h-4" />
-            <span>ระบบอวัยวะ ({organCategories.length})</span>
+            <span>หมวดหมู่ระบบ ({groupCategories.length})</span>
           </button>
           <button
             id="tab-btn-clusters"
@@ -389,7 +389,7 @@ export const RelatedGroupsView: React.FC<RelatedGroupsViewProps> = ({
             >
               <div className="flex items-center gap-2 truncate">
                 <Heart className="w-4 h-4 text-rose-600 shrink-0" />
-                <span className="text-[#627D98] font-normal text-xs">ระบบอวัยวะ:</span>
+                <span className="text-[#627D98] font-normal text-xs">หมวดหมู่:</span>
                 <span className="truncate font-bold text-[#102A43]">
                   {selectedOrgan.nameTh} ({organWords.length} คำ)
                 </span>
@@ -405,7 +405,7 @@ export const RelatedGroupsView: React.FC<RelatedGroupsViewProps> = ({
                   aria-hidden="true"
                 />
                 <div className="mt-1.5 p-2 bg-white rounded-xl border border-[#D2E0EC] shadow-2xl max-h-72 overflow-y-auto space-y-1 animate-slide-up z-50 relative">
-                  {organCategories.map((organ) => {
+                  {groupCategories.map((organ) => {
                     const isSelected = organ.id === selectedOrganId;
                     const count = ALL_VOCAB.filter(w => w.category.includes(organ.id) || w.relatedGroup.includes(organ.id)).length;
                     return (
@@ -445,10 +445,10 @@ export const RelatedGroupsView: React.FC<RelatedGroupsViewProps> = ({
           <div className="hidden lg:block lg:col-span-4 bg-white p-4 rounded-2xl border border-[#D2E0EC] shadow-xs space-y-2">
             <h3 className="text-xs font-bold text-[#829AB1] uppercase tracking-wider px-2 flex items-center gap-1.5">
               <Heart className="w-3.5 h-3.5 text-rose-600" />
-              <span>เลือกระบบอวัยวะ (11 ระบบ)</span>
+              <span>เลือกหมวดหมู่ระบบ ({groupCategories.length} หมวด)</span>
             </h3>
             <div className="space-y-1.5 max-h-[600px] overflow-y-auto pr-1">
-              {organCategories.map((organ) => {
+              {groupCategories.map((organ) => {
                 const isSelected = organ.id === selectedOrganId;
                 const count = ALL_VOCAB.filter(w => w.category.includes(organ.id) || w.relatedGroup.includes(organ.id)).length;
 

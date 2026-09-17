@@ -34,7 +34,9 @@ export const SYSTEM_CATEGORIES = [
   { id: 'ระบบผิวหนังและขน', nameTh: 'ผิวหนัง ขน และบาดแผล', nameEn: 'Dermatology & Wounds', icon: 'Layers', color: 'orange', isOrgan: true, organNameTh: 'ผิวหนังและขน' },
   { id: 'ระบบประสาทและความรู้สึก', nameTh: 'ประสาทและสมอง', nameEn: 'Neurology & Sensory', icon: 'Brain', color: 'violet', isOrgan: true, organNameTh: 'สมองและระบบประสาท' },
   { id: 'ระบบกระดูกและข้อ', nameTh: 'กระดูก ข้อ และการเคลื่อนไหว', nameEn: 'Orthopedics & Joints', icon: 'Activity', color: 'stone', isOrgan: true, organNameTh: 'กระดูก ข้อ และกล้ามเนื้อ' },
+  { id: 'ระบบต่อมไร้ท่อและภูมิคุ้มกัน', nameTh: 'ต่อมไร้ท่อและภูมิคุ้มกัน', nameEn: 'Endocrine & Immune', icon: 'Shield', color: 'emerald', isOrgan: true, organNameTh: 'ต่อมไร้ท่อและภูมิคุ้มกัน' },
   { id: 'อาการทั่วไปและสัญญาณชีพ', nameTh: 'อาการทั่วไป ไข้ และสารน้ำ', nameEn: 'General & Vital Signs', icon: 'Thermometer', color: 'red', isOrgan: false },
+  { id: 'อื่นๆ', nameTh: 'อื่นๆ และพยาธิสภาพ', nameEn: 'Others & Pathology', icon: 'MoreHorizontal', color: 'slate', isOrgan: false },
 ];
 
 // Special Related / Semantic Clusters

@@ -245,7 +245,7 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
               <span>คำที่บันทึกไว้ ({bookmarkedIds.length})</span>
             </button>
 
-            {(searchQuery || selectedLetter !== 'ALL' || selectedCategory !== 'all' || showOnlyBookmarked || selectedMasteryFilter !== 'all') && (
+            {(searchQuery || selectedLetter !== 'ALL' || selectedCategory !== 'all' || showOnlyBookmarked || selectedMasteryFilter !== 'all' || categoryTypeTab !== 'all') && (
               <button
                 id="btn-reset-filters"
                 onClick={() => {
@@ -253,6 +253,7 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                   setSearchQuery('');
                   setSelectedLetter('ALL');
                   setSelectedCategory('all');
+                  setCategoryTypeTab('all');
                   setSelectedMasteryFilter('all');
                   setShowOnlyBookmarked(false);
                 }}
@@ -424,7 +425,7 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                 <span className="text-[#627D98] font-normal">หมวดหมู่:</span>
                 <span className="truncate text-[#102A43]">
                   {selectedCategory === 'all_organs' 
-                    ? '🫀 รวมทุกระบบอวัยวะ (11 ระบบ)' 
+                    ? '🫀 รวมทุกระบบอวัยวะ (12 ระบบ)' 
                     : SYSTEM_CATEGORIES.find(c => c.id === selectedCategory)?.nameTh || 'ทุกหมวดหมู่'}
                 </span>
               </div>
@@ -445,7 +446,11 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                   <div className="grid grid-cols-3 gap-1 p-1 bg-[#F0F5FA] rounded-lg mb-2 text-[11px] font-bold">
                     <button
                       type="button"
-                      onClick={() => setCategoryTypeTab('all')}
+                      onClick={() => {
+                        soundManager.playClick();
+                        setCategoryTypeTab('all');
+                        setSelectedCategory('all');
+                      }}
                       className={`py-1 rounded text-center transition-colors ${categoryTypeTab === 'all' ? 'bg-white text-[#102A43] shadow-xs' : 'text-[#627D98]'}`}
                     >
                       ทั้งหมด
@@ -486,7 +491,7 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                           : 'text-rose-800 bg-rose-50 hover:bg-rose-100'
                       }`}
                     >
-                      <span>🫀 รวมทุกระบบอวัยวะ (11 ระบบ)</span>
+                      <span>🫀 รวมทุกระบบอวัยวะ (12 ระบบ)</span>
                       {selectedCategory === 'all_organs' && <Check className="w-3.5 h-3.5 text-white" />}
                     </button>
                   )}
@@ -611,7 +616,7 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
 
         {/* Desktop View: Category Pills & A - Z Navigation Bar */}
         <div className="hidden md:block space-y-2.5">
-          {/* Category Grouping Tabs: ทุกหมวดหมู่ vs แยกเฉพาะระบบอวัยวะ (11 ระบบ) vs อาการทั่วไป */}
+          {/* Category Grouping Tabs: ทุกหมวดหมู่ vs แยกเฉพาะระบบอวัยวะ (12 ระบบ) vs อาการทั่วไป */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 p-1 bg-[#F0F5FA] rounded-xl border border-[#D2E0EC] text-xs">
               <button
@@ -620,6 +625,7 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                 onClick={() => {
                   soundManager.playClick();
                   setCategoryTypeTab('all');
+                  setSelectedCategory('all');
                 }}
                 className={`px-3 py-1 rounded-lg font-bold transition-colors ${
                   categoryTypeTab === 'all'
@@ -645,7 +651,7 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                     : 'text-[#627D98] hover:text-rose-700'
                 }`}
               >
-                <span>🫀 แยกเฉพาะระบบอวัยวะ (11 ระบบ)</span>
+                <span>🫀 แยกเฉพาะระบบอวัยวะ (12 ระบบ)</span>
               </button>
               <button
                 id="cat-group-general"
@@ -687,7 +693,7 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                     : 'bg-rose-50 hover:bg-rose-100 border-rose-200 text-rose-800'
                 }`}
               >
-                รวมทุกระบบอวัยวะ (11 ระบบ)
+                รวมทุกระบบอวัยวะ (12 ระบบ)
               </button>
             )}
 
