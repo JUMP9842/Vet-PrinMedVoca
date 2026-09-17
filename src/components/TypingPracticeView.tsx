@@ -617,7 +617,21 @@ export const TypingPracticeView: React.FC<TypingPracticeViewProps> = ({
                       autoCorrect="off"
                       spellCheck="false"
                       value={typedInput}
-                      onChange={(e) => setTypedInput(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setTypedInput(val);
+                        
+                        // Auto-check logic
+                        if (currentWord && !isSubmitted) {
+                          const targetWord = mode === 'th_to_en' ? currentWord.word : currentWord.meaning;
+                          if (val.trim().toLowerCase() === targetWord.trim().toLowerCase()) {
+                            soundManager.playClick();
+                            setIsSubmitted(true);
+                            // Auto-evaluate as correct since they typed it exactly right
+                            setTimeout(() => handleSelfEvaluation(true), 300);
+                          }
+                        }
+                      }}
                       placeholder={mode === 'th_to_en' ? 'เช่น bradycardia' : 'เช่น ภาวะหัวใจเต้นช้า'}
                       className="w-full px-4 py-3 text-base sm:text-lg rounded-xl bg-[#F0F5FA] border-2 border-[#D2E0EC] focus:border-[#486581] focus:bg-white text-[#102A43] outline-none transition-all font-medium pr-12"
                     />
