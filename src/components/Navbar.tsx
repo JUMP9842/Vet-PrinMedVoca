@@ -250,8 +250,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Navigation Tabs - Desktop Only (on mobile, user taps the dropdown button to expand the list) */}
-        <nav className="hidden md:flex items-center space-x-1.5 overflow-x-auto py-2 border-t border-[#E8EFF6] no-scrollbar">
+        {/* Navigation Tabs - Desktop Only (flex-wrap ensures no horizontal scroll on smaller desktop/tablet screens) */}
+        <nav className="hidden md:flex flex-wrap items-center gap-1.5 py-2 border-t border-[#E8EFF6]">
           {navTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = currentTab === tab.id;
@@ -260,9 +260,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 key={tab.id}
                 id={`tab-btn-${tab.id}`}
                 onClick={() => handleSelectTab(tab.id)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all shrink-0 select-none min-h-[40px] ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs lg:text-sm font-semibold whitespace-nowrap transition-all shrink-0 select-none min-h-[38px] ${
                   isActive
-                    ? 'bg-[#486581] text-white shadow-xs font-bold scale-[1.02]'
+                    ? 'bg-[#486581] text-white shadow-xs font-bold'
                     : 'text-[#486581] hover:text-[#102A43] hover:bg-[#EBF2F7] bg-[#F7FAFC]/80 border border-transparent'
                 }`}
               >

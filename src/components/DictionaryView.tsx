@@ -18,7 +18,9 @@ import {
   CreditCard,
   Keyboard,
   ListFilter,
-  Play
+  Play,
+  LayoutList,
+  LayoutGrid
 } from 'lucide-react';
 import { VocabItem, MasteryStatus } from '../types';
 import { SYSTEM_CATEGORIES } from '../data';
@@ -59,6 +61,7 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedMasteryFilter, setSelectedMasteryFilter] = useState<'all' | MasteryStatus | 'unrated'>('all');
   const [showOnlyBookmarked, setShowOnlyBookmarked] = useState(false);
+  const [desktopViewMode, setDesktopViewMode] = useState<'table' | 'grid'>('table');
   const [activeSpeechId, setActiveSpeechId] = useState<string | null>(null);
   const [mobileCategoryOpen, setMobileCategoryOpen] = useState(false);
   const [mobileLetterOpen, setMobileLetterOpen] = useState(false);
@@ -532,9 +535,9 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
         </div>
 
         {/* Desktop View: Category Pills & A - Z Navigation Bar */}
-        <div className="hidden md:block space-y-3">
-          {/* Category Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+        <div className="hidden md:block space-y-2.5">
+          {/* Category Pills (Flex-wrap to eliminate horizontal scroll) */}
+          <div className="flex flex-wrap items-center gap-1.5 pb-0.5">
             {SYSTEM_CATEGORIES.map((cat) => {
               const isSelected = selectedCategory === cat.id;
               return (
@@ -545,9 +548,9 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                     soundManager.playClick();
                     setSelectedCategory(cat.id);
                   }}
-                  className={`px-3.5 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors border select-none ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors border select-none ${
                     isSelected
-                      ? 'bg-[#486581] border-[#486581] text-white'
+                      ? 'bg-[#486581] border-[#486581] text-white shadow-2xs'
                       : 'bg-[#F0F5FA] hover:bg-[#E4ECF4] border-[#D2E0EC] text-[#486581]'
                   }`}
                 >
@@ -557,9 +560,9 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
             })}
           </div>
 
-          {/* A - Z Navigation Bar */}
-          <div className="flex items-center justify-between gap-1 overflow-x-auto pt-2 border-t border-[#E8EFF6] no-scrollbar">
-            <div className="flex gap-1">
+          {/* A - Z Navigation Bar (Flex-wrap to eliminate horizontal scroll) */}
+          <div className="flex flex-wrap items-center justify-between gap-1 pt-2 border-t border-[#E8EFF6]">
+            <div className="flex flex-wrap gap-1 items-center">
               {ALPHABET.map((letter) => {
                 const count = letterCounts[letter] || 0;
                 const isSelected = selectedLetter === letter;
@@ -574,11 +577,11 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                       soundManager.playClick();
                       setSelectedLetter(letter);
                     }}
-                    className={`px-2.5 py-1.5 rounded-lg text-sm font-bold transition-colors select-none ${
+                    className={`px-2 py-1 rounded-lg text-xs font-bold transition-colors select-none ${
                       isSelected
                         ? 'bg-[#334E68] text-white shadow-xs'
                         : isDisabled
-                        ? 'text-[#BAC7D5] cursor-not-allowed opacity-50'
+                        ? 'text-[#BAC7D5] cursor-not-allowed opacity-40'
                         : 'text-[#486581] hover:bg-[#EBF2F7] hover:text-[#102A43]'
                     }`}
                   >
@@ -587,7 +590,7 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                 );
               })}
             </div>
-            <span className="text-sm text-[#627D98] font-semibold whitespace-nowrap ml-3">
+            <span className="text-xs text-[#627D98] font-semibold whitespace-nowrap ml-auto">
               {filteredVocab.length} คำ
             </span>
           </div>
@@ -680,6 +683,58 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
 
       {/* Vocabulary Card / Table Container */}
       <div className="bg-[#FFFFFF] rounded-2xl border border-[#D2E0EC] shadow-xs overflow-hidden">
+        {/* Table & Card Toolbar Header (Desktop & Mobile) */}
+        {filteredVocab.length > 0 && (
+          <div className="px-4 py-3 bg-[#F8FAFC] border-b border-[#E8EFF6] flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-xs sm:text-sm text-[#102A43]">
+                รายการคำศัพท์ ({filteredVocab.length} คำ)
+              </span>
+              <span className="hidden lg:inline-block text-xs text-[#627D98]">
+                • แสดงรายละเอียดครบถ้วน ไม่ต้องเลื่อนซ้ายขวา
+              </span>
+            </div>
+
+            {/* Desktop View Switcher: Table View vs Card Grid View */}
+            <div className="hidden md:inline-flex items-center p-1 rounded-xl bg-[#EDF3F8] border border-[#D2E0EC] gap-1">
+              <button
+                id="btn-view-mode-table"
+                type="button"
+                onClick={() => {
+                  soundManager.playClick();
+                  setDesktopViewMode('table');
+                }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
+                  desktopViewMode === 'table'
+                    ? 'bg-white text-[#102A43] shadow-xs'
+                    : 'text-[#627D98] hover:text-[#102A43]'
+                }`}
+                title="มุมมองตารางพอดีหน้าจอ (ไม่ต้องเลื่อนซ้ายขวา)"
+              >
+                <LayoutList className="w-3.5 h-3.5 text-[#006270]" />
+                <span>ตารางพอดีจอ</span>
+              </button>
+              <button
+                id="btn-view-mode-grid"
+                type="button"
+                onClick={() => {
+                  soundManager.playClick();
+                  setDesktopViewMode('grid');
+                }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
+                  desktopViewMode === 'grid'
+                    ? 'bg-white text-[#102A43] shadow-xs'
+                    : 'text-[#627D98] hover:text-[#102A43]'
+                }`}
+                title="มุมมองการ์ดสรุป (ไม่ต้องเลื่อนซ้ายขวา)"
+              >
+                <LayoutGrid className="w-3.5 h-3.5 text-[#006270]" />
+                <span>การ์ดสรุป</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         {filteredVocab.length === 0 ? (
           <div className="p-10 sm:p-14 text-center space-y-3">
             <p className="font-bold text-base sm:text-lg text-[#102A43]">ไม่พบคำศัพท์ที่ตรงกับเงื่อนไข</p>
@@ -892,141 +947,353 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
               })}
             </div>
 
-            {/* Desktop Table (shown on screens >= md) */}
-            <div className="hidden md:block overflow-x-auto">
-              <table className="w-full text-left border-collapse" id="main-vocab-table">
-                <thead>
-                  <tr className="bg-[#F0F5FA] border-b border-[#D2E0EC] text-[#486581] font-bold text-sm tracking-wide">
-                    <th className="py-3.5 px-4 w-12 text-center">#</th>
-                    <th className="py-3.5 px-4 min-w-[230px]">คำศัพท์ (English)</th>
-                    <th className="py-3.5 px-4 min-w-[170px]">คำอ่านไทย (ไม่มีหัว)</th>
-                    <th className="py-3.5 px-4 min-w-[280px]">ความหมายทางการแพทย์</th>
-                    <th className="py-3.5 px-4 min-w-[170px] hidden md:table-cell">ระบบอวัยวะ</th>
-                    <th className="py-3.5 px-4 min-w-[200px] hidden lg:table-cell">กลุ่มที่เชื่อมโยง & รากศัพท์</th>
-                    <th className="py-3.5 px-4 min-w-[220px] text-center">ระดับความจำ</th>
-                    <th className="py-3.5 px-4 w-16 text-center">บันทึก</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#E8EFF6] text-base">
-                  {filteredVocab.map((item, index) => {
-                    const isBookmarked = bookmarkedIds.includes(item.id);
-                    const isSpeakingNormal = activeSpeechId === `${item.id}_norm`;
-                    const isSpeakingSlow = activeSpeechId === `${item.id}_slow`;
+            {/* Desktop View (Table or Grid Mode, both with ZERO horizontal scrolling) */}
+            {desktopViewMode === 'table' ? (
+              <div className="hidden md:block overflow-hidden">
+                <table className="w-full text-left border-collapse table-fixed" id="main-vocab-table">
+                  <thead>
+                    <tr className="bg-[#F0F5FA] border-b border-[#D2E0EC] text-[#486581] font-bold text-xs lg:text-sm tracking-wide">
+                      <th className="py-3 px-3 w-10 text-center">#</th>
+                      <th className="py-3 px-3 w-[24%] lg:w-[22%]">คำศัพท์ & คำอ่าน</th>
+                      <th className="py-3 px-3 w-[36%] lg:w-[38%]">ความหมายทางการแพทย์ & รากศัพท์</th>
+                      <th className="py-3 px-3 w-[18%] lg:w-[18%]">ระบบร่างกาย & กลุ่ม</th>
+                      <th className="py-3 px-2 w-[18%] lg:w-[18%] text-center">ระดับความจำ</th>
+                      <th className="py-3 px-2 w-12 text-center">บันทึก</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#E8EFF6] text-sm">
+                    {filteredVocab.map((item, index) => {
+                      const isBookmarked = bookmarkedIds.includes(item.id);
+                      const isSpeakingNormal = activeSpeechId === `${item.id}_norm`;
+                      const isSpeakingSlow = activeSpeechId === `${item.id}_slow`;
+                      const isSpeakingThai = activeSpeechId === `${item.id}_th`;
 
-                    return (
-                      <tr
-                        key={item.id}
-                        id={`vocab-row-${item.id}`}
-                        onClick={() => onSelectWordDetail(item)}
-                        className="hover:bg-[#F7FAFC] transition-colors cursor-pointer group"
-                      >
-                        {/* Index */}
-                        <td className="py-4 px-4 text-center font-medium text-[#829AB1]">
-                          {index + 1}
-                        </td>
+                      return (
+                        <tr
+                          key={item.id}
+                          id={`vocab-row-${item.id}`}
+                          onClick={() => onSelectWordDetail(item)}
+                          className="hover:bg-[#F7FAFC] transition-colors cursor-pointer group"
+                        >
+                          {/* Index */}
+                          <td className="py-3.5 px-3 text-center font-medium text-xs text-[#829AB1] align-top">
+                            {index + 1}
+                          </td>
 
-                        {/* English Word & Audio Buttons */}
-                        <td className="py-4 px-4">
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-base sm:text-lg text-[#102A43] group-hover:text-[#006270] transition-colors">
-                              {item.word}
-                            </span>
+                          {/* English Word, Audio Buttons & Thai Phonetic */}
+                          <td className="py-3.5 px-3 align-top">
+                            <div className="space-y-1.5">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="font-bold text-base text-[#102A43] group-hover:text-[#006270] transition-colors break-words">
+                                  {item.word}
+                                </span>
 
-                            {/* Normal Speed Speaker Button */}
-                            <button
-                              id={`btn-pronounce-${item.id}`}
-                              onClick={(e) => handlePronounce(e, item.word, item.id, false)}
-                              className={`p-1.5 rounded-lg transition-colors flex items-center gap-1 ${
-                                isSpeakingNormal 
-                                  ? 'bg-[#486581] text-white' 
-                                  : 'text-[#627D98] hover:text-[#102A43] hover:bg-[#E4ECF4]'
-                              }`}
-                              title="ฟังเสียงออกเสียงภาษาอังกฤษ (ความเร็วปกติ)"
-                              aria-label="Normal audio speed"
-                            >
-                              <Volume2 className="w-4 h-4" />
-                            </button>
+                                <div className="inline-flex items-center gap-1 shrink-0">
+                                  {/* Normal Speed Audio */}
+                                  <button
+                                    id={`btn-pronounce-${item.id}`}
+                                    onClick={(e) => handlePronounce(e, item.word, item.id, false)}
+                                    className={`p-1 rounded-md transition-colors ${
+                                      isSpeakingNormal 
+                                        ? 'bg-[#486581] text-white' 
+                                        : 'text-[#627D98] hover:text-[#102A43] hover:bg-[#E4ECF4]'
+                                    }`}
+                                    title="ฟังเสียงออกเสียงภาษาอังกฤษ (ปกติ)"
+                                    aria-label="Normal audio speed"
+                                  >
+                                    <Volume2 className="w-3.5 h-3.5" />
+                                  </button>
 
-                            {/* Slow Speed Turtle Button */}
-                            <button
-                              id={`btn-pronounce-slow-${item.id}`}
-                              onClick={(e) => handlePronounce(e, item.word, item.id, true)}
-                              className={`px-1.5 py-1 rounded-lg transition-colors flex items-center gap-1 text-xs font-semibold ${
-                                isSpeakingSlow 
-                                  ? 'bg-[#334E68] text-white' 
-                                  : 'text-[#829AB1] hover:text-[#334E68] hover:bg-[#E4ECF4]'
-                              }`}
-                              title="ฟังเสียงออกเสียงแบบช้าๆ (Turtle Slow Speed 0.55x)"
-                              aria-label="Slow audio speed"
-                            >
-                              <Snail className="w-4 h-4" />
-                              <span className="text-[11px] hidden sm:inline">ช้า</span>
-                            </button>
-                          </div>
-                        </td>
-
-                        {/* Thai Phonetic (Loopless) */}
-                        <td className="py-4 px-4">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-[#334E68] font-semibold text-sm sm:text-base">
-                              {item.phoneticTh}
-                            </span>
-                            <button
-                              id={`btn-pronounce-th-${item.id}`}
-                              onClick={(e) => handlePronounceThai(e, item.phoneticTh, item.id)}
-                              className={`p-1 rounded-md transition-colors ${
-                                activeSpeechId === `${item.id}_th`
-                                  ? 'bg-[#006270] text-white'
-                                  : 'text-[#006270] hover:bg-[#E0FCFF]'
-                              }`}
-                              title="ฟังเสียงสำเนียงไทย"
-                              aria-label="Thai pronunciation"
-                            >
-                              <Volume1 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </td>
-
-                        {/* Thai Meaning */}
-                        <td className="py-4 px-4 text-[#243B53]">
-                          <div className="space-y-1">
-                            <p className="font-medium text-sm sm:text-base text-[#102A43] leading-snug">
-                              {item.meaning}
-                            </p>
-                            {item.tags.length > 0 && (
-                              <div className="flex flex-wrap gap-1">
-                                {item.tags.slice(0, 3).map((tag, tIdx) => (
-                                  <span key={tIdx} className="text-xs text-[#627D98] bg-[#F0F5FA] px-1.5 py-0.5 rounded">
-                                    #{tag}
-                                  </span>
-                                ))}
+                                  {/* Slow Speed Audio */}
+                                  <button
+                                    id={`btn-pronounce-slow-${item.id}`}
+                                    onClick={(e) => handlePronounce(e, item.word, item.id, true)}
+                                    className={`px-1.5 py-0.5 rounded-md transition-colors flex items-center gap-0.5 text-xs font-semibold ${
+                                      isSpeakingSlow 
+                                        ? 'bg-[#334E68] text-white' 
+                                        : 'text-[#829AB1] hover:text-[#334E68] hover:bg-[#E4ECF4]'
+                                    }`}
+                                    title="ฟังเสียงออกเสียงแบบช้าๆ (Turtle 0.55x)"
+                                    aria-label="Slow audio speed"
+                                  >
+                                    <Snail className="w-3.5 h-3.5" />
+                                    <span className="text-[10px] hidden xl:inline">ช้า</span>
+                                  </button>
+                                </div>
                               </div>
-                            )}
-                          </div>
-                        </td>
 
-                        {/* Category */}
-                        <td className="py-4 px-4 hidden md:table-cell">
-                          <span className="text-sm font-medium text-[#486581]">
+                              {/* Thai Phonetic (Loopless) + Thai Accent Button */}
+                              <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-[#F0F5FA] border border-[#D2E0EC] max-w-full">
+                                <span className="text-xs font-medium text-[#334E68] truncate">
+                                  {item.phoneticTh}
+                                </span>
+                                <button
+                                  id={`btn-pronounce-th-${item.id}`}
+                                  onClick={(e) => handlePronounceThai(e, item.phoneticTh, item.id)}
+                                  className={`p-0.5 rounded transition-colors shrink-0 ${
+                                    isSpeakingThai
+                                      ? 'bg-[#006270] text-white'
+                                      : 'text-[#006270] hover:bg-[#E0FCFF]'
+                                  }`}
+                                  title="ฟังเสียงสำเนียงไทย"
+                                  aria-label="Thai pronunciation"
+                                >
+                                  <Volume1 className="w-3 h-3" />
+                                </button>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Thai Meaning & Root Breakdown */}
+                          <td className="py-3.5 px-3 align-top text-[#243B53]">
+                            <div className="space-y-1">
+                              <p className="font-medium text-sm text-[#102A43] leading-snug break-words">
+                                {item.meaning}
+                              </p>
+                              {item.rootMeaning && (
+                                <p className="text-xs text-[#627D98] flex items-start gap-1 leading-tight">
+                                  <span className="text-[#829AB1] font-semibold shrink-0">รากศัพท์:</span>
+                                  <span className="break-words">{item.rootMeaning}</span>
+                                </p>
+                              )}
+                              {item.tags.length > 0 && (
+                                <div className="flex flex-wrap gap-1 pt-0.5">
+                                  {item.tags.slice(0, 3).map((tag, tIdx) => (
+                                    <span key={tIdx} className="text-[10px] text-[#627D98] bg-[#F0F5FA] px-1.5 py-0.5 rounded">
+                                      #{tag}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </td>
+
+                          {/* System Category & Related Group */}
+                          <td className="py-3.5 px-3 align-top">
+                            <div className="space-y-1">
+                              <span className="inline-block text-xs font-semibold text-[#006270] bg-[#E0FCFF] px-2 py-0.5 rounded-md break-words">
+                                {item.category}
+                              </span>
+                              {item.relatedGroup && (
+                                <p className="text-xs text-[#486581] font-medium leading-tight break-words">
+                                  {item.relatedGroup}
+                                </p>
+                              )}
+                            </div>
+                          </td>
+
+                          {/* Mastery Recall Status */}
+                          <td className="py-3.5 px-2 align-top text-center" onClick={(e) => e.stopPropagation()}>
+                            <div className="inline-flex items-center justify-center p-0.5 sm:p-1 rounded-xl bg-[#F0F5FA] border border-[#D2E0EC] gap-1 shadow-2xs">
+                              <button
+                                id={`btn-table-mastery-mastered-${item.id}`}
+                                type="button"
+                                onClick={() => {
+                                  const current = masteryStatus[item.id];
+                                  const next = current === 'mastered' ? null : 'mastered';
+                                  if (next) soundManager.playCorrect();
+                                  else soundManager.playClick();
+                                  onUpdateMastery(item.id, next);
+                                }}
+                                className={`px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
+                                  masteryStatus[item.id] === 'mastered'
+                                    ? 'bg-emerald-600 text-white shadow-xs'
+                                    : 'text-[#047857] hover:bg-white hover:text-emerald-800'
+                                }`}
+                                title="ติ๊ก: จำได้แล้ว"
+                              >
+                                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                                <span className="hidden xl:inline">จำได้แล้ว</span>
+                                <span className="xl:hidden">จำได้</span>
+                              </button>
+                              <button
+                                id={`btn-table-mastery-learning-${item.id}`}
+                                type="button"
+                                onClick={() => {
+                                  const current = masteryStatus[item.id];
+                                  const next = current === 'learning' ? null : 'learning';
+                                  soundManager.playClick();
+                                  onUpdateMastery(item.id, next);
+                                }}
+                                className={`px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
+                                  masteryStatus[item.id] === 'learning'
+                                    ? 'bg-amber-500 text-white shadow-xs'
+                                    : 'text-[#B45309] hover:bg-white hover:text-amber-800'
+                                }`}
+                                title="ติ๊ก: พอจำได้"
+                              >
+                                <HelpCircle className="w-3.5 h-3.5 shrink-0" />
+                                <span className="hidden xl:inline">พอจำได้</span>
+                                <span className="xl:hidden">พอได้</span>
+                              </button>
+                              <button
+                                id={`btn-table-mastery-forgotten-${item.id}`}
+                                type="button"
+                                onClick={() => {
+                                  const current = masteryStatus[item.id];
+                                  const next = current === 'forgotten' ? null : 'forgotten';
+                                  soundManager.playClick();
+                                  onUpdateMastery(item.id, next);
+                                }}
+                                className={`px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
+                                  masteryStatus[item.id] === 'forgotten'
+                                    ? 'bg-rose-600 text-white shadow-xs'
+                                    : 'text-[#B91C1C] hover:bg-white hover:text-rose-800'
+                                }`}
+                                title="ติ๊ก: จำไม่ได้"
+                              >
+                                <XCircle className="w-3.5 h-3.5 shrink-0" />
+                                <span className="hidden xl:inline">จำไม่ได้</span>
+                                <span className="xl:hidden">ลืม</span>
+                              </button>
+                            </div>
+                          </td>
+
+                          {/* Bookmark button */}
+                          <td className="py-3.5 px-2 align-top text-center">
+                            <button
+                              id={`btn-bookmark-${item.id}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                soundManager.playClick();
+                                onToggleBookmark(item.id);
+                              }}
+                              className={`p-1.5 rounded-xl transition-colors ${
+                                isBookmarked 
+                                  ? 'text-[#F59E0B] bg-[#FFFBEB] hover:bg-[#FEF3C7]' 
+                                  : 'text-[#BAC7D5] hover:text-[#627D98] hover:bg-[#F0F5FA]'
+                              }`}
+                              title={isBookmarked ? 'ลบออกจากรายการบันทึก' : 'บันทึกคำศัพท์นี้'}
+                            >
+                              {isBookmarked ? (
+                                <BookmarkCheck className="w-5 h-5 fill-[#F59E0B]" />
+                              ) : (
+                                <Bookmark className="w-5 h-5" />
+                              )}
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              /* Desktop Grid View (Card Grid Mode with ZERO horizontal scrolling) */
+              <div className="hidden md:grid md:grid-cols-2 xl:grid-cols-3 gap-3.5 p-4 bg-[#F8FAFC]">
+                {filteredVocab.map((item, index) => {
+                  const isBookmarked = bookmarkedIds.includes(item.id);
+                  const isSpeakingNormal = activeSpeechId === `${item.id}_norm`;
+                  const isSpeakingSlow = activeSpeechId === `${item.id}_slow`;
+                  const isSpeakingThai = activeSpeechId === `${item.id}_th`;
+
+                  return (
+                    <div
+                      key={item.id}
+                      id={`grid-vocab-card-${item.id}`}
+                      onClick={() => onSelectWordDetail(item)}
+                      className="p-4 bg-white rounded-xl border border-[#D2E0EC] hover:border-[#486581] hover:shadow-sm transition-all cursor-pointer space-y-3 flex flex-col justify-between"
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="text-xs font-bold text-[#829AB1]">#{index + 1}</span>
+                              <span className="font-bold text-lg text-[#102A43] group-hover:text-[#006270]">
+                                {item.word}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1.5 mt-1">
+                              <span className="text-xs font-semibold text-[#334E68] bg-[#F0F5FA] px-2 py-0.5 rounded-md border border-[#D2E0EC]">
+                                {item.phoneticTh}
+                              </span>
+                              <button
+                                id={`btn-grid-pronounce-th-${item.id}`}
+                                onClick={(e) => handlePronounceThai(e, item.phoneticTh, item.id)}
+                                className={`p-1 rounded transition-colors ${
+                                  isSpeakingThai ? 'bg-[#006270] text-white' : 'text-[#006270] hover:bg-[#E0FCFF]'
+                                }`}
+                                title="ฟังเสียงสำเนียงไทย"
+                              >
+                                <Volume1 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+
+                          <button
+                            id={`btn-grid-bookmark-${item.id}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              soundManager.playClick();
+                              onToggleBookmark(item.id);
+                            }}
+                            className={`p-1.5 rounded-xl transition-colors shrink-0 ${
+                              isBookmarked 
+                                ? 'text-[#F59E0B] bg-[#FFFBEB]' 
+                                : 'text-[#BAC7D5] hover:text-[#627D98] hover:bg-[#F0F5FA]'
+                            }`}
+                          >
+                            {isBookmarked ? (
+                              <BookmarkCheck className="w-5 h-5 fill-[#F59E0B]" />
+                            ) : (
+                              <Bookmark className="w-5 h-5" />
+                            )}
+                          </button>
+                        </div>
+
+                        <p className="text-sm font-medium text-[#243B53] leading-relaxed">
+                          {item.meaning}
+                        </p>
+
+                        {item.rootMeaning && (
+                          <p className="text-xs text-[#627D98] flex items-start gap-1">
+                            <span className="text-[#829AB1] font-semibold shrink-0">รากศัพท์:</span>
+                            <span>{item.rootMeaning}</span>
+                          </p>
+                        )}
+
+                        <div className="flex items-center justify-between gap-1.5 pt-1 flex-wrap">
+                          <span className="text-xs font-semibold text-[#006270] bg-[#E0FCFF] px-2 py-0.5 rounded-md">
                             {item.category}
                           </span>
-                        </td>
+                          {item.relatedGroup && (
+                            <span className="text-[11px] text-[#486581] font-medium">
+                              {item.relatedGroup}
+                            </span>
+                          )}
+                        </div>
+                      </div>
 
-                        {/* Related group & root */}
-                        <td className="py-4 px-4 hidden lg:table-cell">
-                          <div className="space-y-0.5">
-                            <span className="text-sm font-medium text-[#334E68]">{item.relatedGroup}</span>
-                            {item.rootMeaning && (
-                              <p className="text-xs text-[#829AB1] line-clamp-1">{item.rootMeaning}</p>
-                            )}
-                          </div>
-                        </td>
-
-                        {/* Mastery Recall Status */}
-                        <td className="py-4 px-3 text-center" onClick={(e) => e.stopPropagation()}>
-                          <div className="inline-flex items-center p-1 rounded-xl bg-[#F0F5FA] border border-[#D2E0EC] gap-1 shadow-2xs">
+                      <div className="pt-2 border-t border-[#E8EFF6] space-y-2" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between gap-1">
+                          <div className="flex items-center gap-1">
                             <button
-                              id={`btn-table-mastery-mastered-${item.id}`}
+                              id={`btn-grid-pronounce-en-${item.id}`}
+                              onClick={(e) => handlePronounce(e, item.word, item.id, false)}
+                              className={`px-2 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors ${
+                                isSpeakingNormal ? 'bg-[#486581] text-white' : 'bg-[#F0F5FA] text-[#486581] hover:bg-[#E4ECF4]'
+                              }`}
+                              title="ฟังเสียงอังกฤษปกติ"
+                            >
+                              <Volume2 className="w-3.5 h-3.5" />
+                              <span>ปกติ</span>
+                            </button>
+                            <button
+                              id={`btn-grid-pronounce-slow-${item.id}`}
+                              onClick={(e) => handlePronounce(e, item.word, item.id, true)}
+                              className={`px-2 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors ${
+                                isSpeakingSlow ? 'bg-[#334E68] text-white' : 'bg-[#F0F5FA] text-[#627D98] hover:bg-[#E4ECF4]'
+                              }`}
+                              title="ฟังเสียงอังกฤษช้า"
+                            >
+                              <Snail className="w-3.5 h-3.5" />
+                              <span>ช้า</span>
+                            </button>
+                          </div>
+
+                          <div className="flex items-center gap-1">
+                            <button
+                              id={`btn-grid-mastery-mastered-${item.id}`}
                               type="button"
                               onClick={() => {
                                 const current = masteryStatus[item.id];
@@ -1035,18 +1302,17 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                                 else soundManager.playClick();
                                 onUpdateMastery(item.id, next);
                               }}
-                              className={`px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
+                              className={`p-1.5 rounded-lg text-xs font-bold transition-all ${
                                 masteryStatus[item.id] === 'mastered'
                                   ? 'bg-emerald-600 text-white shadow-xs'
-                                  : 'text-[#047857] hover:bg-white hover:text-emerald-800'
+                                  : 'bg-[#F0F5FA] text-[#047857] hover:bg-emerald-50'
                               }`}
-                              title="ติ๊ก: จำได้แล้ว"
+                              title="จำได้แล้ว"
                             >
-                              <CheckCircle2 className="w-3.5 h-3.5" />
-                              <span>จำได้แล้ว</span>
+                              <CheckCircle2 className="w-4 h-4" />
                             </button>
                             <button
-                              id={`btn-table-mastery-learning-${item.id}`}
+                              id={`btn-grid-mastery-learning-${item.id}`}
                               type="button"
                               onClick={() => {
                                 const current = masteryStatus[item.id];
@@ -1054,18 +1320,17 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                                 soundManager.playClick();
                                 onUpdateMastery(item.id, next);
                               }}
-                              className={`px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
+                              className={`p-1.5 rounded-lg text-xs font-bold transition-all ${
                                 masteryStatus[item.id] === 'learning'
                                   ? 'bg-amber-500 text-white shadow-xs'
-                                  : 'text-[#B45309] hover:bg-white hover:text-amber-800'
+                                  : 'bg-[#F0F5FA] text-[#B45309] hover:bg-amber-50'
                               }`}
-                              title="ติ๊ก: พอจำได้"
+                              title="พอจำได้"
                             >
-                              <HelpCircle className="w-3.5 h-3.5" />
-                              <span>พอจำได้</span>
+                              <HelpCircle className="w-4 h-4" />
                             </button>
                             <button
-                              id={`btn-table-mastery-forgotten-${item.id}`}
+                              id={`btn-grid-mastery-forgotten-${item.id}`}
                               type="button"
                               onClick={() => {
                                 const current = masteryStatus[item.id];
@@ -1073,48 +1338,23 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                                 soundManager.playClick();
                                 onUpdateMastery(item.id, next);
                               }}
-                              className={`px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
+                              className={`p-1.5 rounded-lg text-xs font-bold transition-all ${
                                 masteryStatus[item.id] === 'forgotten'
                                   ? 'bg-rose-600 text-white shadow-xs'
-                                  : 'text-[#B91C1C] hover:bg-white hover:text-rose-800'
+                                  : 'bg-[#F0F5FA] text-[#B91C1C] hover:bg-rose-50'
                               }`}
-                              title="ติ๊ก: จำไม่ได้"
+                              title="จำไม่ได้"
                             >
-                              <XCircle className="w-3.5 h-3.5" />
-                              <span>จำไม่ได้</span>
+                              <XCircle className="w-4 h-4" />
                             </button>
                           </div>
-                        </td>
-
-                        {/* Bookmark button */}
-                        <td className="py-4 px-4 text-center">
-                          <button
-                            id={`btn-bookmark-${item.id}`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              soundManager.playClick();
-                              onToggleBookmark(item.id);
-                            }}
-                            className={`p-2 rounded-xl transition-colors ${
-                              isBookmarked 
-                                ? 'text-[#F59E0B] bg-[#FFFBEB] hover:bg-[#FEF3C7]' 
-                                : 'text-[#BAC7D5] hover:text-[#627D98] hover:bg-[#F0F5FA]'
-                            }`}
-                            title={isBookmarked ? 'ลบออกจากรายการบันทึก' : 'บันทึกคำศัพท์นี้'}
-                          >
-                            {isBookmarked ? (
-                              <BookmarkCheck className="w-5 h-5 fill-[#F59E0B]" />
-                            ) : (
-                              <Bookmark className="w-5 h-5" />
-                            )}
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </>
         )}
       </div>
