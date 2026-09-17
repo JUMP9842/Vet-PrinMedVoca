@@ -61,6 +61,7 @@ export const TypingPracticeView: React.FC<TypingPracticeViewProps> = ({
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [typedInput, setTypedInput] = useState<string>('');
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+  const [isExactMatch, setIsExactMatch] = useState<boolean>(false);
   const [results, setResults] = useState<{
     word: VocabItem;
     userTyped: string;
@@ -95,6 +96,7 @@ export const TypingPracticeView: React.FC<TypingPracticeViewProps> = ({
     setCurrentIndex(0);
     setTypedInput('');
     setIsSubmitted(false);
+    setIsExactMatch(false);
     setResults([]);
     setIsCompleted(false);
     setIsStarted(true);
@@ -116,6 +118,15 @@ export const TypingPracticeView: React.FC<TypingPracticeViewProps> = ({
     if (e) e.preventDefault();
     if (!typedInput.trim() || isSubmitted) return;
     soundManager.playClick();
+    
+    if (currentWord) {
+      const targetWord = mode === 'th_to_en' ? currentWord.word : currentWord.meaning;
+      if (typedInput.trim().toLowerCase() === targetWord.trim().toLowerCase()) {
+        setIsExactMatch(true);
+        soundManager.playCorrect();
+      }
+    }
+    
     setIsSubmitted(true);
   };
 
@@ -142,6 +153,7 @@ export const TypingPracticeView: React.FC<TypingPracticeViewProps> = ({
       setCurrentIndex(currentIndex + 1);
       setTypedInput('');
       setIsSubmitted(false);
+      setIsExactMatch(false);
       setTimeout(() => {
         inputRef.current?.focus();
       }, 50);
@@ -617,21 +629,7 @@ export const TypingPracticeView: React.FC<TypingPracticeViewProps> = ({
                       autoCorrect="off"
                       spellCheck="false"
                       value={typedInput}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setTypedInput(val);
-                        
-                        // Auto-check logic
-                        if (currentWord && !isSubmitted) {
-                          const targetWord = mode === 'th_to_en' ? currentWord.word : currentWord.meaning;
-                          if (val.trim().toLowerCase() === targetWord.trim().toLowerCase()) {
-                            soundManager.playClick();
-                            setIsSubmitted(true);
-                            // Auto-evaluate as correct since they typed it exactly right
-                            setTimeout(() => handleSelfEvaluation(true), 300);
-                          }
-                        }
-                      }}
+                      onChange={(e) => setTypedInput(e.target.value)}
                       placeholder={mode === 'th_to_en' ? 'เช่น bradycardia' : 'เช่น ภาวะหัวใจเต้นช้า'}
                       className="w-full px-4 py-3 text-base sm:text-lg rounded-xl bg-[#F0F5FA] border-2 border-[#D2E0EC] focus:border-[#486581] focus:bg-white text-[#102A43] outline-none transition-all font-medium pr-12"
                     />
@@ -710,33 +708,50 @@ export const TypingPracticeView: React.FC<TypingPracticeViewProps> = ({
                   </div>
                 </div>
 
-                {/* Self-check selector: user explicitly decides if they were correct */}
-                <div className="space-y-2">
-                  <p className="text-center text-xs font-bold text-[#486581] uppercase tracking-wider">
-                    คุณตรวจสอบคำตอบแล้ว คุณตอบถูกต้องหรือไม่?
-                  </p>
-                  <div className="grid grid-cols-2 gap-3">
+                {/* Evaluation State */}
+                {isExactMatch ? (
+                  <div className="space-y-3">
+                    <div className="p-3 bg-[#ECFDF5] border border-[#A7F3D0] rounded-xl text-[#065F46] text-center">
+                      <CheckCircle2 className="w-6 h-6 mx-auto mb-1 text-[#059669]" />
+                      <p className="font-bold">ตอบถูกต้องเป๊ะ!</p>
+                    </div>
                     <button
-                      id="btn-self-check-incorrect"
-                      type="button"
-                      onClick={() => handleSelfEvaluation(false)}
-                      className="py-3 px-4 rounded-xl border-2 border-[#FECACA] bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#991B1B] font-bold text-sm flex items-center justify-center gap-2 transition-colors shadow-2xs"
-                    >
-                      <XCircle className="w-5 h-5" />
-                      <span>ฉันตอบไม่ถูกต้อง (ผิด)</span>
-                    </button>
-
-                    <button
-                      id="btn-self-check-correct"
                       type="button"
                       onClick={() => handleSelfEvaluation(true)}
-                      className="py-3 px-4 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors shadow-xs"
+                      className="w-full py-3 px-4 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors shadow-xs"
                     >
-                      <CheckCircle2 className="w-5 h-5" />
-                      <span>ฉันตอบถูกต้อง (+10 XP)</span>
+                      <span>ไปข้อถัดไป (+10 XP)</span>
+                      <ArrowRight className="w-5 h-5" />
                     </button>
                   </div>
-                </div>
+                ) : (
+                  <div className="space-y-2">
+                    <p className="text-center text-xs font-bold text-[#486581] uppercase tracking-wider">
+                      คุณตรวจสอบคำตอบแล้ว คุณตอบถูกต้องหรือไม่?
+                    </p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        id="btn-self-check-incorrect"
+                        type="button"
+                        onClick={() => handleSelfEvaluation(false)}
+                        className="py-3 px-4 rounded-xl border-2 border-[#FECACA] bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#991B1B] font-bold text-sm flex items-center justify-center gap-2 transition-colors shadow-2xs"
+                      >
+                        <XCircle className="w-5 h-5" />
+                        <span>ฉันตอบไม่ถูกต้อง (ผิด)</span>
+                      </button>
+
+                      <button
+                        id="btn-self-check-correct"
+                        type="button"
+                        onClick={() => handleSelfEvaluation(true)}
+                        className="py-3 px-4 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors shadow-xs"
+                      >
+                        <CheckCircle2 className="w-5 h-5" />
+                        <span>ฉันตอบถูกต้อง (+10 XP)</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
