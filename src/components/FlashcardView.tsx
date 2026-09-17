@@ -53,7 +53,6 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 }) => {
   // Config state
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedMasteryFilter, setSelectedMasteryFilter] = useState<'all' | MasteryStatus>('all');
   const [frontMode, setFrontMode] = useState<FlashcardFrontMode>('en'); // 'en' = English front, 'th' = Thai meaning front
   const [showOnlyBookmarks, setShowOnlyBookmarks] = useState(false);
   const [mobileCatDropdownOpen, setMobileCatDropdownOpen] = useState(false);
@@ -87,9 +86,6 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
     }
     return allVocab.filter((item) => {
       if (showOnlyBookmarks && !bookmarkedIds.includes(item.id)) return false;
-      if (selectedMasteryFilter !== 'all') {
-        if (masteryStatus[item.id] !== selectedMasteryFilter) return false;
-      }
       if (selectedCategory !== 'all') {
         if (!item.category.includes(selectedCategory) && !item.relatedGroup.includes(selectedCategory)) {
           return false;
@@ -97,7 +93,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
       }
       return true;
     });
-  }, [allVocab, customWordSet, selectedCategory, selectedMasteryFilter, showOnlyBookmarks, bookmarkedIds, masteryStatus]);
+  }, [allVocab, customWordSet, selectedCategory, showOnlyBookmarks, bookmarkedIds]);
 
   const initDeck = useCallback((wordsToUse?: VocabItem[]) => {
     const list = wordsToUse || filteredPool;
@@ -113,7 +109,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
 
   useEffect(() => {
     initDeck();
-  }, [selectedCategory, selectedMasteryFilter, showOnlyBookmarks, initDeck]);
+  }, [selectedCategory, showOnlyBookmarks, initDeck]);
 
   const currentCard = deck[currentIndex] || null;
 
@@ -142,24 +138,19 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
     }
   };
 
-  const handleMarkMastery = (status: MasteryStatus) => {
+  const handleMarkMastered = () => {
     if (!currentCard) return;
-    if (onUpdateMastery) {
-      onUpdateMastery(currentCard.id, status);
-    }
-    if (status === 'mastered') {
-      soundManager.playCorrect();
-      setMasteredIds((prev) => Array.from(new Set([...prev, currentCard.id])));
-      setReviewIds((prev) => prev.filter((id) => id !== currentCard.id));
-    } else if (status === 'learning') {
-      soundManager.playClick();
-      setReviewIds((prev) => Array.from(new Set([...prev, currentCard.id])));
-      setMasteredIds((prev) => prev.filter((id) => id !== currentCard.id));
-    } else {
-      soundManager.playIncorrect();
-      setReviewIds((prev) => Array.from(new Set([...prev, currentCard.id])));
-      setMasteredIds((prev) => prev.filter((id) => id !== currentCard.id));
-    }
+    soundManager.playCorrect();
+    setMasteredIds((prev) => Array.from(new Set([...prev, currentCard.id])));
+    setReviewIds((prev) => prev.filter((id) => id !== currentCard.id));
+    handleNext();
+  };
+
+  const handleMarkReview = () => {
+    if (!currentCard) return;
+    soundManager.playIncorrect();
+    setReviewIds((prev) => Array.from(new Set([...prev, currentCard.id])));
+    setMasteredIds((prev) => prev.filter((id) => id !== currentCard.id));
     handleNext();
   };
 
@@ -215,15 +206,12 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
       if (e.code === 'Space') {
         e.preventDefault();
         handleFlip();
-      } else if (e.code === 'ArrowRight' || e.key === '1') {
+      } else if (e.code === 'ArrowRight') {
         e.preventDefault();
-        handleMarkMastery('mastered');
-      } else if (e.key === '2') {
+        handleMarkMastered();
+      } else if (e.code === 'ArrowLeft') {
         e.preventDefault();
-        handleMarkMastery('learning');
-      } else if (e.code === 'ArrowLeft' || e.key === '3') {
-        e.preventDefault();
-        handleMarkMastery('forgotten');
+        handleMarkReview();
       }
     };
 
@@ -281,80 +269,6 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
               }`}
             >
               คำแปลไทยขึ้นก่อน
-            </button>
-          </div>
-        </div>
-
-        {/* Mastery Filter Bar (ทบทวนตามระดับความจำ) */}
-        <div className="pt-3 border-t border-[#E8EFF6] flex items-center justify-between gap-2 flex-wrap">
-          <span className="text-xs font-bold text-[#334E68] flex items-center gap-1.5">
-            <ListFilter className="w-3.5 h-3.5 text-[#486581]" />
-            <span>ระดับการจำที่ต้องการทบทวน:</span>
-          </span>
-
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <button
-              id="flashcard-filter-mastery-all"
-              type="button"
-              onClick={() => {
-                soundManager.playClick();
-                setSelectedMasteryFilter('all');
-              }}
-              className={`px-3 py-1 rounded-lg text-xs font-bold border transition-colors ${
-                selectedMasteryFilter === 'all'
-                  ? 'bg-[#334E68] text-white border-[#334E68]'
-                  : 'bg-[#F0F5FA] hover:bg-[#E4ECF4] text-[#334E68] border-[#D2E0EC]'
-              }`}
-            >
-              ทุกระดับ
-            </button>
-            <button
-              id="flashcard-filter-mastery-forgotten"
-              type="button"
-              onClick={() => {
-                soundManager.playClick();
-                setSelectedMasteryFilter('forgotten');
-              }}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors flex items-center gap-1 ${
-                selectedMasteryFilter === 'forgotten'
-                  ? 'bg-rose-600 text-white border-rose-600'
-                  : 'bg-rose-50 hover:bg-rose-100 text-rose-800 border-rose-200'
-              }`}
-            >
-              <XCircle className="w-3.5 h-3.5" />
-              <span>จำไม่ได้ (เน้นพิเศษ)</span>
-            </button>
-            <button
-              id="flashcard-filter-mastery-learning"
-              type="button"
-              onClick={() => {
-                soundManager.playClick();
-                setSelectedMasteryFilter('learning');
-              }}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors flex items-center gap-1 ${
-                selectedMasteryFilter === 'learning'
-                  ? 'bg-amber-500 text-white border-amber-500'
-                  : 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-200'
-              }`}
-            >
-              <HelpCircle className="w-3.5 h-3.5" />
-              <span>พอจำได้</span>
-            </button>
-            <button
-              id="flashcard-filter-mastery-mastered"
-              type="button"
-              onClick={() => {
-                soundManager.playClick();
-                setSelectedMasteryFilter('mastered');
-              }}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors flex items-center gap-1 ${
-                selectedMasteryFilter === 'mastered'
-                  ? 'bg-emerald-600 text-white border-emerald-600'
-                  : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
-              }`}
-            >
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>จำได้แล้ว</span>
             </button>
           </div>
         </div>
@@ -801,35 +715,25 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({
               </button>
             </div>
 
-            {/* Evaluation Buttons: 3 Memory Tiers */}
+            {/* Action Buttons: Review vs Mastered */}
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <button
-                id="btn-flashcard-forgotten"
-                onClick={() => handleMarkMastery('forgotten')}
-                className="flex-1 sm:flex-none px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border-2 border-[#FECACA] bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#991B1B] text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition-colors shadow-2xs"
-                title="จำไม่ได้เลย ต้องการทบทวนบ่อยๆ"
+                id="btn-flashcard-review"
+                onClick={handleMarkReview}
+                className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl border-2 border-[#FECACA] bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#991B1B] text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-colors shadow-2xs"
+                title="ยังจำไม่ได้ ต้องทบทวนเพิ่ม (กด ArrowLeft บนคีย์บอร์ด)"
               >
-                <XCircle className="w-4 h-4" />
-                <span>จำไม่ได้</span>
-              </button>
-
-              <button
-                id="btn-flashcard-learning"
-                onClick={() => handleMarkMastery('learning')}
-                className="flex-1 sm:flex-none px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border-2 border-[#FDE68A] bg-[#FFFBEB] hover:bg-[#FEF3C7] text-[#92400E] text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition-colors shadow-2xs"
-                title="พอจำได้ คุ้นๆ หรือยังไม่แม่นยำ 100%"
-              >
-                <HelpCircle className="w-4 h-4" />
-                <span>พอจำได้</span>
+                <X className="w-4 h-4" />
+                <span>ต้องทบทวน</span>
               </button>
 
               <button
                 id="btn-flashcard-mastered"
-                onClick={() => handleMarkMastery('mastered')}
-                className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-[#059669] hover:bg-[#047857] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition-colors shadow-xs"
-                title="จำได้แม่นยำแล้ว (+5 XP)"
+                onClick={handleMarkMastered}
+                className="flex-1 sm:flex-none px-5 sm:px-7 py-2.5 sm:py-3 rounded-xl bg-[#059669] hover:bg-[#047857] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-colors shadow-xs"
+                title="จำได้แล้ว (+5 XP) (กด ArrowRight บนคีย์บอร์ด)"
               >
-                <CheckCircle2 className="w-4 h-4" />
+                <Check className="w-4 h-4" />
                 <span>จำได้แล้ว (+5 XP)</span>
               </button>
             </div>

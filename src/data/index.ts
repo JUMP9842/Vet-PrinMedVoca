@@ -22,19 +22,19 @@ export const VOCAB_MAP = new Map<string, VocabItem>(
 
 // Major Organ System Categories
 export const SYSTEM_CATEGORIES = [
-  { id: 'all', nameTh: 'ทั้งหมด', nameEn: 'All Terms', icon: 'Sparkles', color: 'emerald' },
-  { id: 'ระบบหัวใจและหลอดเลือด', nameTh: 'หัวใจและหลอดเลือด', nameEn: 'Cardiovascular', icon: 'Heart', color: 'rose' },
-  { id: 'ระบบทางเดินหายใจ', nameTh: 'ทางเดินหายใจ', nameEn: 'Respiratory', icon: 'Wind', color: 'sky' },
-  { id: 'ระบบทางเดินอาหาร', nameTh: 'ทางเดินอาหารและตับ', nameEn: 'Gastrointestinal & Liver', icon: 'Utensils', color: 'amber' },
-  { id: 'ระบบทางเดินปัสสาวะ', nameTh: 'ทางเดินปัสสาวะและไต', nameEn: 'Urinary & Renal', icon: 'Droplets', color: 'blue' },
-  { id: 'ระบบสืบพันธุ์', nameTh: 'ระบบสืบพันธุ์และสูติฯ', nameEn: 'Reproductive & Obstetrics', icon: 'Baby', color: 'pink' },
-  { id: 'ระบบตาและการมองเห็น', nameTh: 'ตาและการมองเห็น', nameEn: 'Ophthalmology', icon: 'Eye', color: 'indigo' },
-  { id: 'ระบบหูและช่องหู', nameTh: 'หูและการได้ยิน', nameEn: 'ENT & Otology', icon: 'Ear', color: 'purple' },
-  { id: 'ระบบช่องปากและฟัน', nameTh: 'ช่องปากและฟัน', nameEn: 'Oral & Dental', icon: 'Smile', color: 'teal' },
-  { id: 'ระบบผิวหนังและขน', nameTh: 'ผิวหนัง ขน และบาดแผล', nameEn: 'Dermatology & Wounds', icon: 'Layers', color: 'orange' },
-  { id: 'ระบบประสาทและความรู้สึก', nameTh: 'ประสาทและสมอง', nameEn: 'Neurology & Sensory', icon: 'Brain', color: 'violet' },
-  { id: 'ระบบกระดูกและข้อ', nameTh: 'กระดูก ข้อ และการเคลื่อนไหว', nameEn: 'Orthopedics & Joints', icon: 'Activity', color: 'stone' },
-  { id: 'อาการทั่วไปและสัญญาณชีพ', nameTh: 'อาการทั่วไป ไข้ และสารน้ำ', nameEn: 'General & Vital Signs', icon: 'Thermometer', color: 'red' },
+  { id: 'all', nameTh: 'ทั้งหมด', nameEn: 'All Terms', icon: 'Sparkles', color: 'emerald', isOrgan: false },
+  { id: 'ระบบหัวใจและหลอดเลือด', nameTh: 'หัวใจและหลอดเลือด', nameEn: 'Cardiovascular', icon: 'Heart', color: 'rose', isOrgan: true, organNameTh: 'หัวใจและหลอดเลือด' },
+  { id: 'ระบบทางเดินหายใจ', nameTh: 'ทางเดินหายใจ', nameEn: 'Respiratory', icon: 'Wind', color: 'sky', isOrgan: true, organNameTh: 'ปอดและทางเดินหายใจ' },
+  { id: 'ระบบทางเดินอาหาร', nameTh: 'ทางเดินอาหารและตับ', nameEn: 'Gastrointestinal & Liver', icon: 'Utensils', color: 'amber', isOrgan: true, organNameTh: 'กระเพาะ ลำไส้ และตับ' },
+  { id: 'ระบบทางเดินปัสสาวะ', nameTh: 'ทางเดินปัสสาวะและไต', nameEn: 'Urinary & Renal', icon: 'Droplets', color: 'blue', isOrgan: true, organNameTh: 'ไตและทางเดินปัสสาวะ' },
+  { id: 'ระบบสืบพันธุ์', nameTh: 'ระบบสืบพันธุ์และสูติฯ', nameEn: 'Reproductive & Obstetrics', icon: 'Baby', color: 'pink', isOrgan: true, organNameTh: 'ระบบสืบพันธุ์' },
+  { id: 'ระบบตาและการมองเห็น', nameTh: 'ตาและการมองเห็น', nameEn: 'Ophthalmology', icon: 'Eye', color: 'indigo', isOrgan: true, organNameTh: 'ดวงตาและการมองเห็น' },
+  { id: 'ระบบหูและช่องหู', nameTh: 'หูและการได้ยิน', nameEn: 'ENT & Otology', icon: 'Ear', color: 'purple', isOrgan: true, organNameTh: 'หูและระบบการได้ยิน' },
+  { id: 'ระบบช่องปากและฟัน', nameTh: 'ช่องปากและฟัน', nameEn: 'Oral & Dental', icon: 'Smile', color: 'teal', isOrgan: true, organNameTh: 'ช่องปาก ฟัน และเหงือก' },
+  { id: 'ระบบผิวหนังและขน', nameTh: 'ผิวหนัง ขน และบาดแผล', nameEn: 'Dermatology & Wounds', icon: 'Layers', color: 'orange', isOrgan: true, organNameTh: 'ผิวหนังและขน' },
+  { id: 'ระบบประสาทและความรู้สึก', nameTh: 'ประสาทและสมอง', nameEn: 'Neurology & Sensory', icon: 'Brain', color: 'violet', isOrgan: true, organNameTh: 'สมองและระบบประสาท' },
+  { id: 'ระบบกระดูกและข้อ', nameTh: 'กระดูก ข้อ และการเคลื่อนไหว', nameEn: 'Orthopedics & Joints', icon: 'Activity', color: 'stone', isOrgan: true, organNameTh: 'กระดูก ข้อ และกล้ามเนื้อ' },
+  { id: 'อาการทั่วไปและสัญญาณชีพ', nameTh: 'อาการทั่วไป ไข้ และสารน้ำ', nameEn: 'General & Vital Signs', icon: 'Thermometer', color: 'red', isOrgan: false },
 ];
 
 // Special Related / Semantic Clusters

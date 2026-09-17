@@ -286,6 +286,11 @@ export function App() {
           <RelatedGroupsView
             onSelectWordDetail={setSelectedWordDetail}
             onStartQuizWithWords={handleStartQuizWithWords}
+            onStartFlashcardWithWords={handleStartFlashcardWithWords}
+            masteryStatus={currentMastery}
+            onUpdateMastery={handleUpdateMastery}
+            bookmarkedIds={currentBookmarks}
+            onToggleBookmark={handleToggleBookmark}
           />
         )}
 

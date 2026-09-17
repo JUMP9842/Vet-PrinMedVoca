@@ -59,6 +59,7 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLetter, setSelectedLetter] = useState('ALL');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [categoryTypeTab, setCategoryTypeTab] = useState<'all' | 'organs' | 'general'>('all');
   const [selectedMasteryFilter, setSelectedMasteryFilter] = useState<'all' | MasteryStatus | 'unrated'>('all');
   const [showOnlyBookmarked, setShowOnlyBookmarked] = useState(false);
   const [desktopViewMode, setDesktopViewMode] = useState<'table' | 'grid'>('table');
@@ -115,7 +116,11 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
         if (firstLetter !== selectedLetter) return false;
       }
       // Medical Category & Related Group Filter
-      if (selectedCategory !== 'all') {
+      if (selectedCategory === 'all_organs') {
+        const organCatIds = SYSTEM_CATEGORIES.filter(c => c.isOrgan).map(c => c.id);
+        const matchesAnyOrgan = organCatIds.some(id => item.category.includes(id) || item.relatedGroup.includes(id));
+        if (!matchesAnyOrgan) return false;
+      } else if (selectedCategory !== 'all') {
         if (!item.category.includes(selectedCategory) && !item.relatedGroup.includes(selectedCategory)) {
           return false;
         }
@@ -165,7 +170,11 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
           if (status !== selectedMasteryFilter) return;
         }
       }
-      if (selectedCategory !== 'all') {
+      if (selectedCategory === 'all_organs') {
+        const organCatIds = SYSTEM_CATEGORIES.filter(c => c.isOrgan).map(c => c.id);
+        const matchesAnyOrgan = organCatIds.some(id => item.category.includes(id) || item.relatedGroup.includes(id));
+        if (!matchesAnyOrgan) return;
+      } else if (selectedCategory !== 'all') {
         if (!item.category.includes(selectedCategory) && !item.relatedGroup.includes(selectedCategory)) {
           return;
         }
@@ -176,6 +185,17 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
     });
     return map;
   }, [vocabList, selectedCategory, selectedMasteryFilter, showOnlyBookmarked, bookmarkedIds, masteryStatus]);
+
+  // Categories filtered by group (All, Organ Systems, General)
+  const displayedCategories = useMemo(() => {
+    if (categoryTypeTab === 'organs') {
+      return SYSTEM_CATEGORIES.filter(c => c.isOrgan);
+    }
+    if (categoryTypeTab === 'general') {
+      return SYSTEM_CATEGORIES.filter(c => !c.isOrgan && c.id !== 'all');
+    }
+    return SYSTEM_CATEGORIES;
+  }, [categoryTypeTab]);
 
   return (
     <div className="space-y-6 pb-24 animate-fade-in text-base">
@@ -403,7 +423,9 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                 <Filter className="w-3.5 h-3.5 text-[#486581] shrink-0" />
                 <span className="text-[#627D98] font-normal">หมวดหมู่:</span>
                 <span className="truncate text-[#102A43]">
-                  {SYSTEM_CATEGORIES.find(c => c.id === selectedCategory)?.nameTh || 'ทุกหมวดหมู่'}
+                  {selectedCategory === 'all_organs' 
+                    ? '🫀 รวมทุกระบบอวัยวะ (11 ระบบ)' 
+                    : SYSTEM_CATEGORIES.find(c => c.id === selectedCategory)?.nameTh || 'ทุกหมวดหมู่'}
                 </span>
               </div>
               <ChevronDown className={`w-4 h-4 text-[#486581] transition-transform duration-200 shrink-0 ${mobileCategoryOpen ? 'rotate-180' : ''}`} />
@@ -418,8 +440,58 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                   onClick={() => setMobileCategoryOpen(false)}
                   aria-hidden="true"
                 />
-                <div className="mt-1.5 p-2 bg-white rounded-xl border border-[#D2E0EC] shadow-2xl max-h-60 overflow-y-auto space-y-1 animate-slide-up z-50 relative">
-                  {SYSTEM_CATEGORIES.map((cat) => {
+                <div className="mt-1.5 p-2 bg-white rounded-xl border border-[#D2E0EC] shadow-2xl max-h-72 overflow-y-auto space-y-1 animate-slide-up z-50 relative">
+                  {/* Category Type Switcher on Mobile */}
+                  <div className="grid grid-cols-3 gap-1 p-1 bg-[#F0F5FA] rounded-lg mb-2 text-[11px] font-bold">
+                    <button
+                      type="button"
+                      onClick={() => setCategoryTypeTab('all')}
+                      className={`py-1 rounded text-center transition-colors ${categoryTypeTab === 'all' ? 'bg-white text-[#102A43] shadow-xs' : 'text-[#627D98]'}`}
+                    >
+                      ทั้งหมด
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCategoryTypeTab('organs');
+                        setSelectedCategory('all_organs');
+                      }}
+                      className={`py-1 rounded text-center transition-colors ${categoryTypeTab === 'organs' ? 'bg-rose-600 text-white shadow-xs' : 'text-[#627D98]'}`}
+                    >
+                      🫀 อวัยวะ
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCategoryTypeTab('general');
+                        setSelectedCategory('อาการทั่วไปและสัญญาณชีพ');
+                      }}
+                      className={`py-1 rounded text-center transition-colors ${categoryTypeTab === 'general' ? 'bg-[#334E68] text-white shadow-xs' : 'text-[#627D98]'}`}
+                    >
+                      ทั่วไป
+                    </button>
+                  </div>
+
+                  {categoryTypeTab === 'organs' && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        soundManager.playClick();
+                        setSelectedCategory('all_organs');
+                        setMobileCategoryOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between p-2.5 rounded-lg text-xs font-bold text-left transition-colors ${
+                        selectedCategory === 'all_organs'
+                          ? 'bg-rose-600 text-white'
+                          : 'text-rose-800 bg-rose-50 hover:bg-rose-100'
+                      }`}
+                    >
+                      <span>🫀 รวมทุกระบบอวัยวะ (11 ระบบ)</span>
+                      {selectedCategory === 'all_organs' && <Check className="w-3.5 h-3.5 text-white" />}
+                    </button>
+                  )}
+
+                  {displayedCategories.map((cat) => {
                     const isSelected = selectedCategory === cat.id;
                     return (
                       <button
@@ -432,11 +504,14 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                         }}
                         className={`w-full flex items-center justify-between p-2.5 rounded-lg text-xs font-semibold text-left transition-colors ${
                           isSelected
-                            ? 'bg-[#486581] text-white font-bold'
+                            ? cat.isOrgan ? 'bg-rose-700 text-white font-bold' : 'bg-[#486581] text-white font-bold'
                             : 'text-[#334E68] hover:bg-[#F0F5FA]'
                         }`}
                       >
-                        <span>{cat.nameTh}</span>
+                        <span className="flex items-center gap-1.5">
+                          {cat.isOrgan && <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-rose-500'}`} />}
+                          <span>{cat.nameTh}</span>
+                        </span>
                         {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
                       </button>
                     );
@@ -536,9 +611,87 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
 
         {/* Desktop View: Category Pills & A - Z Navigation Bar */}
         <div className="hidden md:block space-y-2.5">
+          {/* Category Grouping Tabs: ทุกหมวดหมู่ vs แยกเฉพาะระบบอวัยวะ (11 ระบบ) vs อาการทั่วไป */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 p-1 bg-[#F0F5FA] rounded-xl border border-[#D2E0EC] text-xs">
+              <button
+                id="cat-group-all"
+                type="button"
+                onClick={() => {
+                  soundManager.playClick();
+                  setCategoryTypeTab('all');
+                }}
+                className={`px-3 py-1 rounded-lg font-bold transition-colors ${
+                  categoryTypeTab === 'all'
+                    ? 'bg-white text-[#102A43] shadow-xs'
+                    : 'text-[#627D98] hover:text-[#102A43]'
+                }`}
+              >
+                ทุกหมวดหมู่ ({SYSTEM_CATEGORIES.length - 1})
+              </button>
+              <button
+                id="cat-group-organs"
+                type="button"
+                onClick={() => {
+                  soundManager.playClick();
+                  setCategoryTypeTab('organs');
+                  if (selectedCategory === 'all' || selectedCategory === 'อาการทั่วไปและสัญญาณชีพ') {
+                    setSelectedCategory('all_organs');
+                  }
+                }}
+                className={`px-3 py-1 rounded-lg font-bold transition-colors flex items-center gap-1.5 ${
+                  categoryTypeTab === 'organs'
+                    ? 'bg-rose-600 text-white shadow-xs'
+                    : 'text-[#627D98] hover:text-rose-700'
+                }`}
+              >
+                <span>🫀 แยกเฉพาะระบบอวัยวะ (11 ระบบ)</span>
+              </button>
+              <button
+                id="cat-group-general"
+                type="button"
+                onClick={() => {
+                  soundManager.playClick();
+                  setCategoryTypeTab('general');
+                  setSelectedCategory('อาการทั่วไปและสัญญาณชีพ');
+                }}
+                className={`px-3 py-1 rounded-lg font-bold transition-colors ${
+                  categoryTypeTab === 'general'
+                    ? 'bg-[#334E68] text-white shadow-xs'
+                    : 'text-[#627D98] hover:text-[#102A43]'
+                }`}
+              >
+                อาการทั่วไป & สัญญาณชีพ
+              </button>
+            </div>
+
+            {categoryTypeTab === 'organs' && (
+              <span className="text-xs font-semibold text-rose-700 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 flex items-center gap-1">
+                <span>แสดงเฉพาะคำศัพท์ในระบบอวัยวะ</span>
+              </span>
+            )}
+          </div>
+
           {/* Category Pills (Flex-wrap to eliminate horizontal scroll) */}
           <div className="flex flex-wrap items-center gap-1.5 pb-0.5">
-            {SYSTEM_CATEGORIES.map((cat) => {
+            {categoryTypeTab === 'organs' && (
+              <button
+                id="cat-filter-all_organs"
+                onClick={() => {
+                  soundManager.playClick();
+                  setSelectedCategory('all_organs');
+                }}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-colors border select-none ${
+                  selectedCategory === 'all_organs'
+                    ? 'bg-rose-700 border-rose-700 text-white shadow-2xs'
+                    : 'bg-rose-50 hover:bg-rose-100 border-rose-200 text-rose-800'
+                }`}
+              >
+                รวมทุกระบบอวัยวะ (11 ระบบ)
+              </button>
+            )}
+
+            {displayedCategories.map((cat) => {
               const isSelected = selectedCategory === cat.id;
               return (
                 <button
@@ -548,13 +701,20 @@ export const DictionaryView: React.FC<DictionaryViewProps> = ({
                     soundManager.playClick();
                     setSelectedCategory(cat.id);
                   }}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors border select-none ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors border select-none flex items-center gap-1.5 ${
                     isSelected
-                      ? 'bg-[#486581] border-[#486581] text-white shadow-2xs'
+                      ? cat.isOrgan
+                        ? 'bg-rose-700 border-rose-700 text-white shadow-2xs'
+                        : 'bg-[#486581] border-[#486581] text-white shadow-2xs'
+                      : cat.isOrgan
+                      ? 'bg-[#F0F5FA] hover:bg-rose-50 border-[#D2E0EC] text-[#334E68]'
                       : 'bg-[#F0F5FA] hover:bg-[#E4ECF4] border-[#D2E0EC] text-[#486581]'
                   }`}
                 >
-                  {cat.nameTh}
+                  {cat.isOrgan && (
+                    <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-rose-500'}`} />
+                  )}
+                  <span>{cat.nameTh}</span>
                 </button>
               );
             })}
